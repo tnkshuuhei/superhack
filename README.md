@@ -7,9 +7,20 @@
 ## deployed contracts and links
 
 ## Tech stack
-
+- Next.js / Vercel
+- JS/TS/Solidity
+- Alchemy
+- Hardhat/Thirdweb/Wagmi/Rainbow-kit
+- The Graph
+- EAS contract/SDK
+- WorldID
+- Optimism/Base/ZORA
 ## Huge thanks to
-
+- EthGlobal team
+- Optimism team
+- EAS team
+- The Graph team
+- Worldcoin team
 ## Team
 
 ## Getting Started

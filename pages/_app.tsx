@@ -13,12 +13,11 @@ import {
   rabbyWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import {
-  mainnet,
-  polygon,
   optimism,
-  arbitrum,
-  avalanche,
-  bsc,
+  base,
+  baseGoerli,
+  zora,
+  sepolia,
   goerli,
   optimismGoerli,
 } from "wagmi/chains";
@@ -27,16 +26,7 @@ import { publicProvider } from "wagmi/providers/public";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 
 const { chains, publicClient } = configureChains(
-  [
-    mainnet,
-    polygon,
-    optimism,
-    arbitrum,
-    avalanche,
-    bsc,
-    goerli,
-    optimismGoerli,
-  ],
+  [sepolia, optimismGoerli],
   [publicProvider()]
 );
 
@@ -65,7 +55,11 @@ const wagmiClient = createConfig({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig config={wagmiClient}>
-      <RainbowKitProvider chains={chains} initialChain={goerli}>
+      <RainbowKitProvider
+        chains={chains}
+        initialChain={sepolia}
+        modalSize="compact"
+      >
         <StateContextProvider>
           <Component {...pageProps} />;
         </StateContextProvider>

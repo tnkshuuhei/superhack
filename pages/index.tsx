@@ -4,10 +4,11 @@ import React, { useState } from "react";
 import { Inter } from "next/font/google";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useStateContext } from "../context";
-import { Layout, ProjectList } from "../components";
+import { Layout, ProjectList } from "@/components";
 import projects from "@/utils/sampleproject";
+import { NextPage } from "next";
 
-export default function Home() {
+const Home: NextPage = () => {
   const { address, decoded } = useStateContext();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,4 +27,5 @@ export default function Home() {
       )}
     </Layout>
   );
-}
+};
+export default Home;

@@ -3,7 +3,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { StateContextProvider } from "@/context";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
-import { WagmiConfig, configureChains, createClient } from "wagmi";
+import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import {
   injectedWallet,
   rainbowWallet,
@@ -13,12 +13,11 @@ import {
   rabbyWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import {
-  mainnet,
-  polygon,
   optimism,
-  arbitrum,
-  avalanche,
-  bsc,
+  base,
+  baseGoerli,
+  zora,
+  sepolia,
   goerli,
   optimismGoerli,
 } from "wagmi/chains";
@@ -26,19 +25,8 @@ import {
 import { publicProvider } from "wagmi/providers/public";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 
-const { chains, provider } = configureChains(
-  [
-    /*
-		mainnet,
-    polygon,
-    optimism,
-    arbitrum,
-    avalanche,
-    bsc,
-		*/
-    goerli,
-    optimismGoerli,
-  ],
+const { chains, publicClient } = configureChains(
+  [sepolia, optimismGoerli],
   [publicProvider()]
 );
 
@@ -58,16 +46,20 @@ const connectors = connectorsForWallets([
     ],
   },
 ]);
-const wagmiClient = createClient({
+const wagmiClient = createConfig({
   autoConnect: true,
   connectors,
-  provider,
+  publicClient,
 });
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains} initialChain={goerli}>
+    <WagmiConfig config={wagmiClient}>
+      <RainbowKitProvider
+        chains={chains}
+        initialChain={sepolia}
+        modalSize="compact"
+      >
         <StateContextProvider>
           <Component {...pageProps} />;
         </StateContextProvider>

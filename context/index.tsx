@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { EAS } from "@ethereum-attestation-service/eas-sdk";
 import React, { useState, useContext, createContext, useEffect } from "react";
 import {
   useAccount,
@@ -13,12 +14,39 @@ import {
 const ABI =
   require("../smartcontracts/artifacts-zk/contracts//Mycontract.sol/Mycontract.json").abi;
 const StateContext = createContext<any>(null);
+export const EASContractAddress = "0xC2679fBD37d54388Ce493F1DB75320D236e1815e"; // Sepolia v0.26
+const uid =
+  "0xca2804c2e3908ce0d3cc07739b0e84a7df9f0f80b3fafa1e7fdc7c102bcc4cbd";
 const sampleContract: any = {
   address: "0xfE96C671F6BEa573d690C253821Bb1Aa011747ac",
   abi: ABI,
 };
+// import { useEthersProvider } from "./ethers";
+import { Decode } from "@/utils";
 
 export const StateContextProvider = ({ children }: any) => {
+  const [decoded, setDecoded] = useState<any>(null);
+  const provider: any = ethers.providers.getDefaultProvider("sepolia");
+  const eas = new EAS(EASContractAddress);
+  // Gets a default provider (in production use something else like infura/alchemy)
+  // const provider = ethers.providers.getDefaultProvider("sepolia");
+  eas.connect(provider);
+
+  const getAttestations = async () => {
+    const attestations = await eas.getAttestation(uid);
+    const decodedData = Decode(attestations.data);
+    return decodedData;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getAttestations();
+      setDecoded(data);
+    };
+
+    fetchData();
+  }, [eas]);
+
   ///////////////////////////////////////
   // Wagmi hooks
   ///////////////////////////////////////
@@ -27,8 +55,6 @@ export const StateContextProvider = ({ children }: any) => {
     address: address,
   });
   const { data: ensName } = useEnsName({ address: address });
-  const { data: ensAvatar } = useEnsAvatar({ address: address });
-
   ///////////////////////////////////////
   // Read contract with wagmi
   ///////////////////////////////////////
@@ -55,14 +81,6 @@ export const StateContextProvider = ({ children }: any) => {
     ],
   });
 
-  if (getTokenContract !== undefined) {
-    console.log(
-      "getbalance: ",
-      ethers.utils.formatEther(getBalance?.toString()),
-      getTokenContract[2].toString()
-    );
-  }
-
   ///////////////////////////////////////
   // Execute contract with wagmi
   ///////////////////////////////////////
@@ -85,6 +103,7 @@ export const StateContextProvider = ({ children }: any) => {
     <StateContext.Provider
       value={{
         address,
+        decoded,
       }}
     >
       {children}

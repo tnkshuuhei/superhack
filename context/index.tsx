@@ -35,8 +35,6 @@ export const StateContextProvider = ({ children }: any) => {
   const getAttestations = async () => {
     const attestations = await eas.getAttestation(uid);
     const decodedData = Decode(attestations.data);
-    // console.log("Attestation: ", attestations);
-
     return decodedData;
   };
 
@@ -82,14 +80,6 @@ export const StateContextProvider = ({ children }: any) => {
       },
     ],
   });
-
-  if (getTokenContract !== undefined) {
-    console.log(
-      "getbalance: ",
-      ethers.utils.formatEther(getBalance?.toString()),
-      getTokenContract[2].toString()
-    );
-  }
 
   ///////////////////////////////////////
   // Execute contract with wagmi

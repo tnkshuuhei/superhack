@@ -67,7 +67,7 @@ const wagmiClient = createClient({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains} initialChain={mainnet}>
+      <RainbowKitProvider chains={chains} initialChain={goerli}>
         <StateContextProvider>
           <Component {...pageProps} />;
         </StateContextProvider>

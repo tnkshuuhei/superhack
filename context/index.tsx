@@ -11,7 +11,7 @@ import {
   usePrepareContractWrite,
 } from "wagmi";
 const ABI =
-  require("../contracts/artifacts-zk/contracts//Mycontract.sol/Mycontract.json").abi;
+  require("../smartcontracts/artifacts-zk/contracts//Mycontract.sol/Mycontract.json").abi;
 const StateContext = createContext<any>(null);
 const sampleContract: any = {
   address: "0xfE96C671F6BEa573d690C253821Bb1Aa011747ac",

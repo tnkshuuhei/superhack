@@ -8,8 +8,7 @@ const ProjectList = ({ title, isLoading, projects }: any) => {
   const router = useRouter();
   const handleRoute = (project: any) => {
     router.push({
-      pathname: `/${project.title}`,
-      query: project,
+      pathname: `/${project.payoutAddress}`,
     });
   };
 

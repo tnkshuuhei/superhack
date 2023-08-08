@@ -61,7 +61,7 @@ export default function App({ Component, pageProps }: AppProps) {
         modalSize="compact"
       >
         <StateContextProvider>
-          <Component {...pageProps} />;
+          <Component {...pageProps} />
         </StateContextProvider>
       </RainbowKitProvider>
     </WagmiConfig>

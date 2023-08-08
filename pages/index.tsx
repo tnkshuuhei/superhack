@@ -6,7 +6,7 @@ import { Inter } from "next/font/google";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useStateContext } from "../context";
 import { Layout, ProjectList } from "@/components";
-import projects from "@/utils/sampleproject";
+import { projects } from "../utils/sampleproject";
 import { NextPage } from "next";
 
 const Home: NextPage = () => {

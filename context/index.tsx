@@ -16,7 +16,7 @@ export const EASContractAddress = "0xC2679fBD37d54388Ce493F1DB75320D236e1815e"; 
 const uid =
   "0xca2804c2e3908ce0d3cc07739b0e84a7df9f0f80b3fafa1e7fdc7c102bcc4cbd";
 import { Decode } from "@/utils";
-import projects from "@/utils/sampleproject";
+import { projects } from "../utils/sampleproject";
 
 export const StateContextProvider = ({ children }: any) => {
   const [decoded, setDecoded] = useState<any>(null);

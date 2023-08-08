@@ -1,7 +1,5 @@
 "use client";
-import Image from "next/image";
 import { NextPage } from "next";
-import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useStateContext } from "../../context";
 import { Layout, Button, Loader, Forms } from "@/components";

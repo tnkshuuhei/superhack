@@ -37,8 +37,7 @@ const ProjectPage: NextPage = () => {
       setIsLoading(false);
     };
     fetchData();
-  }, []);
-  console.log("project:", project);
+  }, [recipient.address]);
   return (
     <Layout>
       {isLoading && <Loader />}

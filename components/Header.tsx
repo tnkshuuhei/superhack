@@ -1,10 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { NextPage } from "next";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
-const Header: NextPage = () => {
+const Header = () => {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
 

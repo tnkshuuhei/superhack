@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { Layout, Loader } from "@/components";
+import { Button, Layout, Loader } from "@/components";
 import { useStateContext } from "../context";
 import { optimism } from "@/assets";
 
@@ -145,6 +145,41 @@ const ProjectPage: NextPage = () => {
                   <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
                     {project?.payoutAddress}
                   </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1">
+              <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
+                Add Reputation
+              </h4>
+
+              <div className="mt-[20px] flex flex-col p-4 bg-gray-200 rounded-[10px]">
+                <p className="font-epilogue fount-medium text-[20px] leading-[30px] text-center text-black">
+                  Attest to the project reputation
+                </p>
+                <div className="mt-[30px]">
+                  <textarea
+                    rows={3}
+                    placeholder="I support this project because..."
+                    className="w-full py-[10px] sm:px-[20px] px-[15px] outline-none border-[1px] border-[#3a3a43] bg-transparent font-epilogue text-[#808191] text-[18px] leading-[30px] placeholder:text-[#4b5264] rounded-[10px]"
+                    onChange={(e) => setAmount(e.target.value)}
+                  ></textarea>
+
+                  <div className="my-[20px] p-4 bg-[#13131a] rounded-[10px]">
+                    <h4 className="font-epilogue font-semibold text-[14px] leading-[22px] text-white">
+                      Show gratitude with action.
+                    </h4>
+                    <p className="mt-[20px] font-epilogue font-normal leading-[22px] text-[#808191]">
+                      Share your impressions and experiences to pave the way for
+                      a brighter future.
+                    </p>
+                  </div>
+                  <Button
+                    btnType="button"
+                    title="Confirm"
+                    styles="w-full bg-[#3a3a43]"
+                    handleClick={() => {}}
+                  />
                 </div>
               </div>
             </div>

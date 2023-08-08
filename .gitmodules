@@ -1,0 +1,3 @@
+[submodule "sc"]
+	path = sc
+	url = git@github.com:mnm458/superhack-contracts.git

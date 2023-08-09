@@ -26,6 +26,8 @@ const ProjectPage: NextPage = () => {
     Github: "",
     Twitter: "",
     PayoutAddress: "",
+    Round: "",
+    ImageUrl: "",
     id: null,
   });
 
@@ -57,8 +59,8 @@ const ProjectPage: NextPage = () => {
         <div className="bg-white p-10 rounded-xl">
           <div className="w-full flex md:flex-row flex-col gap-[30px]">
             <div className="bg-white w-[150px] w-[150px] rounded-xl">
-              <Image
-                src={optimism}
+              <img
+                src={project.ImageUrl || optimism}
                 alt="campaign"
                 className="w-full h-full object-cover rounded-xl"
               />

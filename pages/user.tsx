@@ -34,7 +34,7 @@ const User: NextPage = () => {
     <Layout>
       {attestationsData.length > 0 ? (
         <ProjectList
-          title="Created Projects"
+          title="Your Projects"
           isLoading={isLoading}
           projects={attestationsData}
         />

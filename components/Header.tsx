@@ -28,8 +28,8 @@ const Header = () => {
     //     accountStatus={{ smallScreen: "address", largeScreen: "full" }}
     //   />
     // </div>
-    <header>
-      <nav className=" border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 mb-4">
+    <div>
+      <nav className=" border-gray-200 px-4 lg:px-6 py-5 dark:bg-gray-800">
         <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
           <Link href="./" className="flex items-center">
             <img
@@ -66,12 +66,14 @@ const Header = () => {
                   href="/user"
                   className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700"
                 >
-                  Created Projects
+                  Your Projects
                 </Link>
               </li>
               <li>
                 <a
                   href="https://github.com/tnkshuuhei/superhack"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700"
                 >
                   Github
@@ -81,7 +83,7 @@ const Header = () => {
           </div>
         </div>
       </nav>
-    </header>
+    </div>
   );
 };
 

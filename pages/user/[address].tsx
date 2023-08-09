@@ -49,7 +49,7 @@ const ProjectPage: NextPage = () => {
     };
     console.log("project", project);
     fetchData();
-  }, [uid]);
+  }, [data]);
   return (
     <Layout>
       {isLoading && <Loader />}

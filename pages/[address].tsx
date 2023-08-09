@@ -49,10 +49,10 @@ const ProjectPage: NextPage = () => {
     };
     console.log("project", project);
     fetchData();
-  }, [uid]);
+  }, [data]);
   return (
     <Layout>
-      {isLoading && <Loader />}
+      {/* {isLoading && <Loader />} */}
       {project && (
         <div className="bg-white p-10 rounded-xl">
           <div className="w-full flex md:flex-row flex-col gap-[30px]">

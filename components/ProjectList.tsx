@@ -8,9 +8,7 @@ import { loader } from "../assets";
 const ProjectList = ({ title, isLoading, projects }: any) => {
   const router = useRouter();
   const handleRoute = (project: any) => {
-    router.push({
-      pathname: `/${project.payoutAddress}`,
-    });
+    router.push(`${router.asPath}/${project.id}`);
   };
 
   return (

@@ -6,8 +6,8 @@ import { useRouter } from "next/router";
 import { Button, Layout, Loader, CustomCard } from "@/components";
 import { optimism } from "@/assets";
 import { formatDecodedData } from "@/utils";
-import { reputation, votes } from "../utils/sampleproject";
-import { GET_SIMPLE_ATTESTATION } from "../graphql";
+import { reputation, votes } from "../../utils/sampleproject";
+import { GET_SIMPLE_ATTESTATION } from "../../graphql";
 import { useQuery } from "@apollo/client";
 
 const ProjectPage: NextPage = () => {

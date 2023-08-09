@@ -41,7 +41,7 @@ const FormField: React.FC<FormFieldProps> = ({
       ) : (
         <input
           required
-          value={value.toString()}
+          value={value}
           onChange={handleChange ? handleChange : undefined}
           type={inputType}
           step="1"

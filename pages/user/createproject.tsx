@@ -3,26 +3,46 @@ import { NextPage } from "next";
 import React, { useState } from "react";
 import { useStateContext } from "../../context";
 import { Layout, Button, Loader, Forms } from "@/components";
-
+import { useRouter } from "next/router";
+const uid =
+  "0x39a85cce69cec29ee89503ff19e6cba1e3647b42392af14fdeea255302ed0c79"; //schema uid
 const CreateProject: NextPage = () => {
-  const { address, decoded } = useStateContext();
+  const router = useRouter();
+  const { address, decoded, addAttestation } = useStateContext();
   const [isLoading, setIsLoading] = useState(false);
   const [formState, setFormState] = useState({
-    projectName: "",
-    projectDescription: "",
-    publicGoods: "",
-    sustainability: "",
-    teamSize: "",
-    submittedDate: "",
-    links: [],
-    website: "",
-    github: "",
-    twitter: "",
-    payoutAddress: "",
-    image_url: "",
-    id: null,
+    // projectName: "",
+    // projectDescription: "",
+    // publicGoods: "",
+    // sustainability: "",
+    // teamSize: "",
+    // submittedDate: Math.floor(new Date().getTime() / 1000),
+    // links: [],
+    // website: "",
+    // github: "",
+    // twitter: "",
+    // payoutAddress: "",
+    // image_url: "",
+    projectName: "Impact House",
+    projectDescription: "Impact House is built for digital public goods",
+    publicGoods: "Impact House make public goods sustainable		",
+    sustainability:
+      "As long as public goods grow up, Impact House can create Impact",
+    teamSize: "1",
+    submittedDate: Math.floor(new Date().getTime() / 1000),
+    links: [
+      "https://docs.attest.sh/docs/welcome",
+      "https://optimism-goerli-bedrock.easscan.org/",
+      "https://github.com/tnkshuuhei",
+    ],
+    website: "https://twitter.com",
+    github: "https://github.com",
+    twitter: "https://twitter.com",
+    payoutAddress: address,
+    image_url: "https://avatars.githubusercontent.com/u/60056322?s=280&v=4",
+    // id: null,
   });
-  console.log("links", formState.links);
+  // console.log("formState", formState);
   const addLink = () => {
     setFormState((prevState: any) => ({
       ...prevState,
@@ -49,6 +69,13 @@ const CreateProject: NextPage = () => {
   };
 
   // TODO: add a attest function to attest project application
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setIsLoading(true);
+    await addAttestation(uid, address, formState);
+    setIsLoading(false);
+    router.push("/user");
+  };
 
   return (
     <Layout>
@@ -57,7 +84,7 @@ const CreateProject: NextPage = () => {
           {isLoading && <Loader />}
           <p className="font-bold font-epilogue text-[32px]">Create Project</p>
           <form
-            onSubmit={(e) => {}}
+            onSubmit={handleSubmit}
             className="w-full flex flex-col gap-[30px]"
           >
             <Forms
@@ -67,7 +94,6 @@ const CreateProject: NextPage = () => {
               handleChange={(e) => handleChange("projectName", e)}
               value={formState.projectName}
             />
-
             <Forms
               labelName="Description"
               isTextArea={true}
@@ -119,7 +145,7 @@ const CreateProject: NextPage = () => {
 
               <Forms
                 labelName="Team Size"
-                inputType="number"
+                inputType="text"
                 placeholder="Enter Team Size"
                 handleChange={(e) => handleChange("teamSize", e)}
                 value={formState.teamSize}
@@ -132,7 +158,7 @@ const CreateProject: NextPage = () => {
               inputType="textarea"
               isTextArea={true}
               placeholder="How do you support development and usage of the OP Stack? What public good do you provide to the Collective?"
-              handleChange={(e) => handleChange("publicGoods", e)}
+              handleTextChange={(e) => handleChange("publicGoods", e)}
               value={formState.publicGoods}
             />
 
@@ -141,7 +167,7 @@ const CreateProject: NextPage = () => {
               inputType="textarea"
               isTextArea={true}
               placeholder="How do you sustain yourself? Please list sources of funding and revenue."
-              handleChange={(e) => handleChange("sustainability", e)}
+              handleTextChange={(e) => handleChange("sustainability", e)}
               value={formState.sustainability}
             />
             <div>
@@ -182,7 +208,9 @@ const CreateProject: NextPage = () => {
                 btnType="submit"
                 title="Create a new project"
                 styles="bg-[#3a3a43]"
-                handleClick={() => {}}
+                handleClick={() => {
+                  handleSubmit;
+                }}
               />
             </div>
           </form>

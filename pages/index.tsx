@@ -6,7 +6,6 @@ import { projects } from "../utils/sampleproject";
 import { NextPage } from "next";
 
 const Home: NextPage = () => {
-  const { address, decoded } = useStateContext();
   const [isLoading, setIsLoading] = useState(false);
 
   return (

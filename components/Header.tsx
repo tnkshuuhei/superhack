@@ -31,7 +31,7 @@ const Header = () => {
     <header>
       <nav className=" border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 mb-4">
         <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
-          <a href="https://flowbite.com" className="flex items-center">
+          <Link href="./" className="flex items-center">
             <img
               src="https://avatars.githubusercontent.com/u/60056322?s=280&v=4"
               className="mr-3 h-6 sm:h-9"
@@ -40,7 +40,7 @@ const Header = () => {
             <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
               ZORA
             </span>
-          </a>
+          </Link>
           <div className="flex items-center lg:order-2">
             <ConnectButton
               showBalance={false}

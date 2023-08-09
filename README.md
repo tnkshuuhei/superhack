@@ -34,15 +34,6 @@ yarn install
 # or
 pnpm install
 ```
-
-setup smartcontract
-
-```bash
-cd smartcontracts
-
-yarn install && yarn build
-```
-
 run frontend server
 
 ```bash

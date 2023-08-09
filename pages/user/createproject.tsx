@@ -4,15 +4,17 @@ import React, { useState } from "react";
 import { useStateContext } from "../../context";
 import { Layout, Button, Loader, Forms } from "@/components";
 import { useRouter } from "next/router";
+// const uid =
+//   "0x39a85cce69cec29ee89503ff19e6cba1e3647b42392af14fdeea255302ed0c79"; //schema uid
 const uid =
-  "0x39a85cce69cec29ee89503ff19e6cba1e3647b42392af14fdeea255302ed0c79"; //schema uid
+  "0xfb388c197362bcecd068bdf640604c86424eb55d60fd92d83e27cb6bdb22c7f3"; //schema uid v2
 const CreateProject: NextPage = () => {
   const router = useRouter();
   const { address, decoded, addAttestation } = useStateContext();
   const [isLoading, setIsLoading] = useState(false);
   const [formState, setFormState] = useState({
-    // projectName: "",
-    // projectDescription: "",
+    // ProjectName: "",
+    // ProjectDescription: "",
     // publicGoods: "",
     // sustainability: "",
     // teamSize: "",
@@ -20,45 +22,46 @@ const CreateProject: NextPage = () => {
     // links: [],
     // website: "",
     // github: "",
-    // twitter: "",
-    // payoutAddress: "",
-    // image_url: "",
-    projectName: "Impact House",
-    projectDescription: "Impact House is built for digital public goods",
-    publicGoods: "Impact House make public goods sustainable		",
-    sustainability:
+    // Twitter: "",
+    // PayoutAddress: "",
+    // ImageUrl: "",
+    Round: "1",
+    ProjectName: "Impact House",
+    ProjectDescription: "Impact House is built for digital public goods",
+    PublicGoods: "Impact House make public goods sustainable		",
+    Sustainability:
       "As long as public goods grow up, Impact House can create Impact",
-    teamSize: "1",
-    submittedDate: Math.floor(new Date().getTime() / 1000),
-    links: [
+    TeamSize: "1",
+    SubmittedDate: Math.floor(new Date().getTime() / 1000),
+    Links: [
       "https://docs.attest.sh/docs/welcome",
       "https://optimism-goerli-bedrock.easscan.org/",
       "https://github.com/tnkshuuhei",
     ],
-    website: "https://twitter.com",
-    github: "https://github.com",
-    twitter: "https://twitter.com",
-    payoutAddress: address,
-    image_url: "https://avatars.githubusercontent.com/u/60056322?s=280&v=4",
+    Website: "https://twitter.com/shutanaka_jp",
+    Github: "https://github.com/tnkshuuhei",
+    Twitter: "https://twitter.com/shutanaka_jp",
+    PayoutAddress: address,
+    ImageUrl: "https://avatars.githubusercontent.com/u/60056322?s=280&v=4",
     // id: null,
   });
   // console.log("formState", formState);
   const addLink = () => {
     setFormState((prevState: any) => ({
       ...prevState,
-      links: [...prevState.links, ""],
+      Links: [...prevState.Links, ""],
     }));
   };
 
   const removeLink = (index: number) => {
-    const updatedLinks = formState.links.filter((_, i) => i !== index);
-    setFormState((prevState) => ({ ...prevState, links: updatedLinks }));
+    const updatedLinks = formState.Links.filter((_, i) => i !== index);
+    setFormState((prevState) => ({ ...prevState, Links: updatedLinks }));
   };
 
   const updateLink = (index: number, value: string) => {
-    const updatedLinks: any = [...formState.links];
+    const updatedLinks: any = [...formState.Links];
     updatedLinks[index] = value;
-    setFormState((prevState) => ({ ...prevState, links: updatedLinks }));
+    setFormState((prevState) => ({ ...prevState, Links: updatedLinks }));
   };
 
   const handleChange = (fieldName: string, e: any) => {
@@ -91,47 +94,47 @@ const CreateProject: NextPage = () => {
               labelName="Project Name"
               inputType="text"
               placeholder="Enter Project Name"
-              handleChange={(e) => handleChange("projectName", e)}
-              value={formState.projectName}
+              handleChange={(e) => handleChange("ProjectName", e)}
+              value={formState.ProjectName}
             />
             <Forms
               labelName="Description"
               isTextArea={true}
               inputType="text"
               placeholder="Enter Description"
-              handleTextChange={(e) => handleChange("projectDescription", e)}
-              value={formState.projectDescription}
+              handleTextChange={(e) => handleChange("ProjectDescription", e)}
+              value={formState.ProjectDescription}
             />
             <Forms
               labelName="Image URL"
               inputType="text"
               placeholder="Enter Image URL"
-              handleChange={(e) => handleChange("image_url", e)}
-              value={formState.image_url}
+              handleChange={(e) => handleChange("ImageUrl", e)}
+              value={formState.ImageUrl}
             />
 
             <Forms
               labelName="Payout Address"
               inputType="text"
               placeholder="Enter Payout Address"
-              handleChange={(e) => handleChange("payoutAddress", e)}
-              value={formState.payoutAddress}
+              handleChange={(e) => handleChange("PayoutAddress", e)}
+              value={formState.PayoutAddress}
             />
             <div className="flex flex-wrap gap-[40px]">
               <Forms
                 labelName="Twitter"
                 inputType="text"
                 placeholder="Enter Twitter URL"
-                handleChange={(e) => handleChange("twitter", e)}
-                value={formState.twitter}
+                handleChange={(e) => handleChange("Twitter", e)}
+                value={formState.Twitter}
               />
 
               <Forms
                 labelName="GitHub"
                 inputType="text"
                 placeholder="Enter GitHub URL"
-                handleChange={(e) => handleChange("github", e)}
-                value={formState.github}
+                handleChange={(e) => handleChange("Github", e)}
+                value={formState.Github}
               />
             </div>
             <div className="flex flex-wrap gap-[40px]">
@@ -139,16 +142,16 @@ const CreateProject: NextPage = () => {
                 labelName="Website"
                 inputType="text"
                 placeholder="Enter Website URL"
-                handleChange={(e) => handleChange("website", e)}
-                value={formState.website}
+                handleChange={(e) => handleChange("Website", e)}
+                value={formState.Website}
               />
 
               <Forms
                 labelName="Team Size"
                 inputType="text"
                 placeholder="Enter Team Size"
-                handleChange={(e) => handleChange("teamSize", e)}
-                value={formState.teamSize}
+                handleChange={(e) => handleChange("TeamSize", e)}
+                value={formState.TeamSize}
               />
             </div>
             {/* You might need a separate component for an array of links or a dynamic list */}
@@ -158,8 +161,8 @@ const CreateProject: NextPage = () => {
               inputType="textarea"
               isTextArea={true}
               placeholder="How do you support development and usage of the OP Stack? What public good do you provide to the Collective?"
-              handleTextChange={(e) => handleChange("publicGoods", e)}
-              value={formState.publicGoods}
+              handleTextChange={(e) => handleChange("PublicGoods", e)}
+              value={formState.PublicGoods}
             />
 
             <Forms
@@ -168,13 +171,13 @@ const CreateProject: NextPage = () => {
               isTextArea={true}
               placeholder="How do you sustain yourself? Please list sources of funding and revenue."
               handleTextChange={(e) => handleChange("sustainability", e)}
-              value={formState.sustainability}
+              value={formState.Sustainability}
             />
             <div>
               <p className="font-epilogue font-medium text-[14px] leading-[22px] text-[#808191] mb-[10px]">
                 Add related links
               </p>
-              {formState.links.map((link, index) => (
+              {formState.Links.map((link, index) => (
                 <div key={index} className="flex items-center space-x-2 mb-4">
                   <Forms
                     inputType="url"

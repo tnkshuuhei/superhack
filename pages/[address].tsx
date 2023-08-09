@@ -4,42 +4,52 @@ import Image from "next/image";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { Button, Layout, Loader, CustomCard } from "@/components";
-import { useStateContext } from "../context";
 import { optimism } from "@/assets";
+import { formatDecodedData } from "@/utils";
 import { reputation, votes } from "../utils/sampleproject";
+import { GET_SIMPLE_ATTESTATION } from "../graphql";
+import { useQuery } from "@apollo/client";
 
 const ProjectPage: NextPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("About");
-  const { address, decoded, fetchAttestation } = useStateContext();
   const [amount, setAmount] = useState("");
   const [project, setProject] = useState({
-    projectName: "",
-    projectDescription: "",
-    publicGoods: "",
-    sustainability: "",
-    teamSize: "",
-    submittedDate: "",
-    links: [],
-    website: "",
-    github: "",
-    twitter: "",
-    payoutAddress: "",
+    ProjectName: "",
+    ProjectDescription: "",
+    PublicGoods: "",
+    Sustainability: "",
+    TeamSize: "",
+    SubmittedDate: "",
+    Links: [],
+    Website: "",
+    Github: "",
+    Twitter: "",
+    PayoutAddress: "",
     id: null,
   });
 
   const router = useRouter();
-  const recipient = router.query;
+  const uid = router.query;
+  const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
+    variables: { id: uid.address },
+  });
+
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
-      const data = await fetchAttestation(recipient.address);
-      console.log("fetched data:", data);
-      setProject(data);
-      setIsLoading(false);
+      if (data && data.attestation) {
+        setIsLoading(true);
+        const project_data = await formatDecodedData(data.attestation);
+        if (project_data) {
+          console.log("fetched data:", project_data);
+          setProject(project_data);
+        }
+        setIsLoading(false);
+      }
     };
+    console.log("project", project);
     fetchData();
-  }, [recipient.address]);
+  }, [uid]);
   return (
     <Layout>
       {isLoading && <Loader />}
@@ -56,7 +66,7 @@ const ProjectPage: NextPage = () => {
             <div className="flex items-center">
               <div className="mt-[20px]">
                 <p className="font-epilogue font-bold text-[30px] md:text-[50px] text-[#808191] leading-[26px] text-justify">
-                  {project?.projectName}
+                  {project?.ProjectName}
                 </p>
               </div>
             </div>
@@ -87,7 +97,7 @@ const ProjectPage: NextPage = () => {
                   </h4>
                   <div className="mt-[20px]">
                     <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.projectDescription}
+                      {project?.ProjectDescription}
                     </p>
                   </div>
                 </div>
@@ -98,7 +108,7 @@ const ProjectPage: NextPage = () => {
                   </h4>
                   <div className="mt-[20px]">
                     <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.publicGoods}
+                      {project?.PublicGoods}
                     </p>
                   </div>
                 </div>
@@ -109,7 +119,7 @@ const ProjectPage: NextPage = () => {
                   </h4>
                   <div className="mt-[20px]">
                     <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.sustainability}
+                      {project?.Sustainability}
                     </p>
                   </div>
                 </div>
@@ -119,7 +129,7 @@ const ProjectPage: NextPage = () => {
                   </h4>
                   <div className="mt-[20px]">
                     <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.teamSize}
+                      {project?.TeamSize}
                     </p>
                   </div>
                 </div>
@@ -129,7 +139,7 @@ const ProjectPage: NextPage = () => {
                   </h4>
                   <div className="mt-[20px]">
                     <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.website}
+                      {project?.Website}
                     </p>
                   </div>
                 </div>
@@ -140,7 +150,7 @@ const ProjectPage: NextPage = () => {
                   </h4>
                   <div className="mt-[20px]">
                     <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.github}
+                      {project?.Github}
                     </p>
                   </div>
                 </div>
@@ -151,7 +161,7 @@ const ProjectPage: NextPage = () => {
                   </h4>
                   <div className="mt-[20px]">
                     <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.twitter}
+                      {project?.Twitter}
                     </p>
                   </div>
                 </div>
@@ -161,7 +171,7 @@ const ProjectPage: NextPage = () => {
                   </h4>
                   <div className="mt-[20px]">
                     <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.payoutAddress}
+                      {project?.PayoutAddress}
                     </p>
                   </div>
                 </div>

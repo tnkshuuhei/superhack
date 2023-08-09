@@ -13,21 +13,22 @@ function extractTwitterUsername(url) {
 }
 
 const ProjectCard = ({
-  projectName,
-  projectDescription,
-  image,
+  ProjectName,
+  ProjectDescription,
+  ImageUrl,
   handleClick,
-  twitter,
+  Twitter,
 }: any) => {
-  const username = extractTwitterUsername(twitter);
+  const username = extractTwitterUsername(Twitter);
+  
 
   return (
     <div
       className="sm:w-[288px] w-full rounded-[15px] bg-white cursor-pointer"
       onClick={handleClick}
     >
-      <Image
-        src={image || optimism}
+      <img
+        src={ImageUrl}
         alt="fund"
         className="w-full h-[158px] object-cover rounded-[15px]"
       />
@@ -35,17 +36,17 @@ const ProjectCard = ({
       <div className="flex flex-col p-4">
         <div className="block">
           <h3 className="font-epilogue font-semibold text-[16px] text-black text-left leading-[26px] truncate">
-            {projectName}
+            {ProjectName}
           </h3>
           <p className="mt-[5px] font-epilogue font-normal text-[#808191] text-left leading-[18px] truncate">
-            {projectDescription}
+            {ProjectDescription}
           </p>
         </div>
 
         <div className="flex items-center mt-[20px] gap-[12px]">
           <div className="w-[30px] h-[30px] rounded-full flex justify-center items-center bg-[#13131a]">
-            <Image
-              src={image || optimism}
+            <img
+              src={ImageUrl || optimism}
               alt="user"
               className="object-contain"
             />

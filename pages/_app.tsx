@@ -21,7 +21,7 @@ import {
   goerli,
   optimismGoerli,
 } from "wagmi/chains";
-
+import { SessionProvider } from "next-auth/react";
 import { publicProvider } from "wagmi/providers/public";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
@@ -59,18 +59,20 @@ const wagmiClient = createConfig({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ApolloProvider client={apolloClient}>
-      <WagmiConfig config={wagmiClient}>
-        <RainbowKitProvider
-          chains={chains}
-          initialChain={sepolia}
-          modalSize="compact"
-        >
-          <StateContextProvider>
-            <Component {...pageProps} />
-          </StateContextProvider>
-        </RainbowKitProvider>
-      </WagmiConfig>
-    </ApolloProvider>
+    <SessionProvider session={pageProps.session}>
+      <ApolloProvider client={apolloClient}>
+        <WagmiConfig config={wagmiClient}>
+          <RainbowKitProvider
+            chains={chains}
+            initialChain={sepolia}
+            modalSize="compact"
+          >
+            <StateContextProvider>
+              <Component {...pageProps} />
+            </StateContextProvider>
+          </RainbowKitProvider>
+        </WagmiConfig>
+      </ApolloProvider>
+    </SessionProvider>
   );
 }

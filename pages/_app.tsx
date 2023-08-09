@@ -24,7 +24,12 @@ import {
 
 import { publicProvider } from "wagmi/providers/public";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
+const apolloClient = new ApolloClient({
+  uri: "https://sepolia.easscan.org/graphql",
+  cache: new InMemoryCache(),
+});
 const { chains, publicClient } = configureChains(
   [sepolia, optimismGoerli],
   [publicProvider()]
@@ -54,16 +59,18 @@ const wagmiClient = createConfig({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <WagmiConfig config={wagmiClient}>
-      <RainbowKitProvider
-        chains={chains}
-        initialChain={sepolia}
-        modalSize="compact"
-      >
-        <StateContextProvider>
-          <Component {...pageProps} />
-        </StateContextProvider>
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <ApolloProvider client={apolloClient}>
+      <WagmiConfig config={wagmiClient}>
+        <RainbowKitProvider
+          chains={chains}
+          initialChain={sepolia}
+          modalSize="compact"
+        >
+          <StateContextProvider>
+            <Component {...pageProps} />
+          </StateContextProvider>
+        </RainbowKitProvider>
+      </WagmiConfig>
+    </ApolloProvider>
   );
 }

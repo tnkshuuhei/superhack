@@ -47,7 +47,7 @@ const User: NextPage = () => {
             <Button
               btnType="button"
               title="Create Project"
-              styles="bg-[#3a3a43]"
+              styles="bg-[#3a3a43] text-white"
               handleClick={handleClick}
             />
           </div>

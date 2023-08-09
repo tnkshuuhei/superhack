@@ -9,6 +9,7 @@ import { formatDecodedData } from "@/utils";
 import { reputation, votes } from "../utils/sampleproject";
 import { GET_SIMPLE_ATTESTATION } from "../graphql";
 import { useQuery } from "@apollo/client";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const ProjectPage: NextPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +31,8 @@ const ProjectPage: NextPage = () => {
     ImageUrl: "",
     id: null,
   });
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
 
   const router = useRouter();
   const uid = router.query;
@@ -204,12 +207,26 @@ const ProjectPage: NextPage = () => {
                         for a brighter future.
                       </p>
                     </div>
-                    <Button
-                      btnType="button"
-                      title="Confirm"
-                      styles="w-full bg-[#3a3a43]"
-                      handleClick={() => {}}
-                    />
+                    {!session ? (
+                      <div>
+                        <Button
+                          btnType="button"
+                          title="Sign In with Worldcoin"
+                          styles="w-full bg-white text-black"
+                          handleClick={(e) => {
+                            e.preventDefault();
+                            signIn("worldcoin");
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <Button
+                        btnType="button"
+                        title="Confirm"
+                        styles="w-full bg-[#3a3a43] text-white"
+                        handleClick={() => {}}
+                      />
+                    )}
                   </div>
                 </div>
               </div>

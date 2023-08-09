@@ -188,7 +188,7 @@ const CreateProject: NextPage = () => {
                   <Button
                     btnType="button"
                     title="Remove"
-                    styles="bg-red-500 "
+                    styles="bg-red-500 text-white"
                     handleClick={() => removeLink(index)}
                   >
                     Remove
@@ -199,7 +199,7 @@ const CreateProject: NextPage = () => {
               <Button
                 btnType="button"
                 title="Add Link"
-                styles="bg-[#3a3a43] "
+                styles="bg-[#3a3a43] text-white"
                 handleClick={addLink}
               >
                 Add Link
@@ -210,7 +210,7 @@ const CreateProject: NextPage = () => {
               <Button
                 btnType="submit"
                 title="Create a new project"
-                styles="bg-[#3a3a43]"
+                styles="bg-[#3a3a43] text-white"
                 handleClick={() => {
                   handleSubmit;
                 }}

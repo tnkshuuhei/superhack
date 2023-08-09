@@ -212,7 +212,7 @@ const ProjectPage: NextPage = () => {
                         <Button
                           btnType="button"
                           title="Sign In with Worldcoin"
-                          styles="w-full bg-[#3a3a43]"
+                          styles="w-full bg-white text-black"
                           handleClick={(e) => {
                             e.preventDefault();
                             signIn("worldcoin");
@@ -223,7 +223,7 @@ const ProjectPage: NextPage = () => {
                       <Button
                         btnType="button"
                         title="Confirm"
-                        styles="w-full bg-[#3a3a43]"
+                        styles="w-full bg-[#3a3a43] text-white"
                         handleClick={() => {}}
                       />
                     )}

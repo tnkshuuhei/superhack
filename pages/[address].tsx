@@ -12,7 +12,7 @@ import {
   Updates,
 } from "@/components";
 import { optimism } from "@/assets";
-import { SCHEMA_UID, formatDecodedData } from "@/utils";
+import { SCHEMA_UID, formatDecodedData, BASE_URL } from "@/utils";
 import { votes } from "../utils/sampleproject";
 import { GET_SIMPLE_ATTESTATION, GET_ATTESTATION_BY_REFID } from "../graphql";
 import { useQuery } from "@apollo/client";
@@ -52,6 +52,7 @@ const ProjectPage: NextPage = () => {
   });
   console.log("reputationState", reputationState);
   const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
+  const baseUrl = BASE_URL[currentChainId];
   const { data: session, status } = useSession();
   const loading = status === "loading";
   const { data: reputationData } = useQuery(GET_ATTESTATION_BY_REFID, {
@@ -251,10 +252,7 @@ const ProjectPage: NextPage = () => {
             // />
           )}
           {activeTab === "Reputation" && (
-            <CustomCard
-              reviews={reputation}
-              baseUrl={"https://sepolia.easscan.org/attestation/view"}
-            />
+            <CustomCard reviews={reputation} baseUrl={baseUrl} />
           )}
 
           {activeTab === "Updates" && (

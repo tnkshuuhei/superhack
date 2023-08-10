@@ -15,7 +15,7 @@ export const SCHEMAS = {
   ProofOfWork:
     "bytes32 ProjectUid,bytes32 MilestoneApplicationUid,bytes32 ApplicationReviewUid,string ProofOfAccomplishment",
   PaymentForMilestone:
-    "	bytes32 ProjectUid,bytes32 ProofOfWorkUid,string TranscationHash",
+    "bytes32 ProjectUid,bytes32 ProofOfWorkUid,string TranscationHash",
 };
 
 export const generateFieldsFromSchemaString = (schemaString: string) => {

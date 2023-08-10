@@ -68,3 +68,32 @@ export const GET_ALL_ATTESTATIONS_BY_ID = gql`
     }
   }
 `;
+export const GET_ATTESTATION_BY_REFID = gql`
+  query Attestations($refUID: String!, $schemaId: String!) {
+    attestations(
+      where: {
+        AND: [
+          { refUID: { equals: $refUID } }
+          { schemaId: { equals: $schemaId } }
+        ]
+      }
+    ) {
+      id
+      data
+      decodedDataJson
+      recipient
+      attester
+      time
+      timeCreated
+      expirationTime
+      revocationTime
+      refUID
+      revocable
+      revoked
+      txid
+      schemaId
+      ipfsHash
+      isOffchain
+    }
+  }
+`;

@@ -14,7 +14,7 @@ import {
 import { optimism } from "@/assets";
 import { SCHEMA_UID, formatDecodedData } from "@/utils";
 import { reputation, votes } from "../utils/sampleproject";
-import { GET_SIMPLE_ATTESTATION, GET_ALL_ATTESTATIONS_BY_ID } from "../graphql";
+import { GET_SIMPLE_ATTESTATION, GET_ATTESTATION_BY_REFID } from "../graphql";
 import { useQuery } from "@apollo/client";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useStateContext } from "@/context";
@@ -53,7 +53,12 @@ const ProjectPage: NextPage = () => {
   const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
   const { data: session, status } = useSession();
   const loading = status === "loading";
-
+  const { data: reputationData } = useQuery(GET_ATTESTATION_BY_REFID, {
+    variables: {
+      refUID: project_uid,
+      schemaId: SCHEMA_UID.REPUTATION_SCHEMA[currentChainId],
+    },
+  });
   const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
     variables: { id: project_uid },
   });
@@ -62,9 +67,12 @@ const ProjectPage: NextPage = () => {
       if (data && data.attestation) {
         setIsLoading(true);
         const project_data = await formatDecodedData(data.attestation);
+        const reputation_data =
+          reputationData.attestations.map(formatDecodedData);
         if (project_data) {
           console.log("fetched data:", project_data);
           setProject(project_data);
+          console.log("reputation_data", reputation_data);
         }
         setIsLoading(false);
       }

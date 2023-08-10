@@ -9,9 +9,11 @@ export const StateContextProvider = ({ children }: any) => {
   const { address } = useAccount();
   const { chain } = useNetwork();
   const [currentChainId, setCurrentChainId] = useState<number>(11155111);
-  if (chain) {
-    setCurrentChainId(chain.id);
-  }
+  useEffect(() => {
+    if (chain) {
+      setCurrentChainId(chain.id);
+    }
+  }, [chain]);
   const EASContractAddress = CONTRACT_ADDRESS[currentChainId];
   const eas = new EAS(EASContractAddress);
   const signer: any = useEthersSigner({ chainId: currentChainId });

@@ -9,6 +9,7 @@ const CreateProject: NextPage = () => {
   const router = useRouter();
   const { address, addAttestation, currentChainId } = useStateContext();
   const uid = SCHEMA_UID.PROJECT_SCHEMA[currentChainId];
+
   const [isLoading, setIsLoading] = useState(false);
   const [formState, setFormState] = useState({
     // ProjectName: "",
@@ -40,7 +41,9 @@ const CreateProject: NextPage = () => {
     Github: "https://github.com/tnkshuuhei",
     Twitter: "https://twitter.com/shutanaka_jp",
     PayoutAddress: address,
-    ImageUrl: "https://avatars.githubusercontent.com/u/60056322?s=280&v=4",
+    // ImageUrl: "https://avatars.githubusercontent.com/u/60056322?s=280&v=4",
+    ImageUrl:
+      "https://assets-global.website-files.com/611dbb3c82ba72fbc285d4e2/613267577e2c89636109a8b9_main%20OpenGraph%20image.png",
     // id: null,
   });
   // console.log("formState", formState);

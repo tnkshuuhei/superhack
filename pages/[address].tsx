@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { Button, Layout, Loader, CustomCard } from "@/components";
+import { Button, Layout, Loader, CustomCard, InfoSection } from "@/components";
 import { optimism } from "@/assets";
 import { formatDecodedData } from "@/utils";
 import { reputation, votes } from "../utils/sampleproject";
@@ -96,91 +96,28 @@ const ProjectPage: NextPage = () => {
           {activeTab === "About" && (
             <div className="flex mt-[20px] lg:flex-row flex-col gap-5">
               <div className="flex-[2] flex flex-col gap-[40px]">
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Project Description
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.ProjectDescription}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Public Goods
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.PublicGoods}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Sustainability
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.Sustainability}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Team Size
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.TeamSize}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Website
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.Website}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Github
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.Github}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Twitter
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.Twitter}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Payout Address
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.PayoutAddress}
-                    </p>
-                  </div>
-                </div>
+                <InfoSection
+                  title="Project Description"
+                  content={project?.ProjectDescription}
+                />
+                <InfoSection
+                  title="Public Goods"
+                  content={project?.PublicGoods}
+                />
+                <InfoSection
+                  title="Sustainability"
+                  content={project?.Sustainability}
+                />
+                <InfoSection title="Team Size" content={project?.TeamSize} />
+                <InfoSection title="Website" content={project?.Website} />
+                <InfoSection title="Github" content={project?.Github} />
+                <InfoSection title="Twitter" content={project?.Twitter} />
+                <InfoSection
+                  title="Payout Address"
+                  content={project?.PayoutAddress}
+                />
               </div>
+
               <div className="flex-1 space-y-6">
                 <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
                   <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">

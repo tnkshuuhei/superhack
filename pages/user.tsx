@@ -6,15 +6,14 @@ import { Layout, ProjectList, Button } from "@/components";
 import { NextPage } from "next";
 import { GET_USER_ATTESTATIONS } from "../graphql";
 import { useQuery } from "@apollo/client";
-import { formatDecodedData } from "@/utils";
+import { formatDecodedData, SCHEMA_UID } from "@/utils";
 
 const User: NextPage = () => {
   const [attestationsData, setAttestationsData] = useState([]);
-  const { address } = useStateContext();
+  const { address, currentChainId } = useStateContext();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const schemaIdValue =
-    "0xfb388c197362bcecd068bdf640604c86424eb55d60fd92d83e27cb6bdb22c7f3";
+  const schemaIdValue = SCHEMA_UID.PROJECT_SCHEMA[currentChainId];
   const { data } = useQuery(GET_USER_ATTESTATIONS, {
     variables: { schemaId: schemaIdValue, attester: address },
   });

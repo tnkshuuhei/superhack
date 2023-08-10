@@ -1,7 +1,7 @@
 const SCHEMA_UID = {
   PROJECT_SCHEMA: {
     11155111:
-      "0xca2804c2e3908ce0d3cc07739b0e84a7df9f0f80b3fafa1e7fdc7c102bcc4cbd", // Sepolia
+      "0xfb388c197362bcecd068bdf640604c86424eb55d60fd92d83e27cb6bdb22c7f3", // Sepolia
     420: "0x4200000000000000000000000000000000000000", // op-goerli
     10: "0x4200000000000000000000000000000000000000", // Optimism
   },

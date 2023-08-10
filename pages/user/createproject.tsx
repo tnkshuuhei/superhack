@@ -4,11 +4,11 @@ import React, { useState } from "react";
 import { useStateContext } from "../../context";
 import { Layout, Button, Loader, Forms } from "@/components";
 import { useRouter } from "next/router";
-const uid =
-  "0xfb388c197362bcecd068bdf640604c86424eb55d60fd92d83e27cb6bdb22c7f3"; //schema uid v2
+import { formatDecodedData, SCHEMA_UID } from "@/utils";
 const CreateProject: NextPage = () => {
   const router = useRouter();
-  const { address, addAttestation } = useStateContext();
+  const { address, addAttestation, currentChainId } = useStateContext();
+  const uid = SCHEMA_UID.PROJECT_SCHEMA[currentChainId];
   const [isLoading, setIsLoading] = useState(false);
   const [formState, setFormState] = useState({
     // ProjectName: "",

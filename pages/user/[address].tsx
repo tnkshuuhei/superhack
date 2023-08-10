@@ -10,6 +10,7 @@ import {
   CustomCard,
   Forms,
   InfoSection,
+  Updates,
 } from "@/components";
 import { optimism } from "@/assets";
 import { formatDecodedData } from "@/utils";
@@ -187,7 +188,11 @@ const ProjectPage: NextPage = () => {
             />
           )}
 
-          {activeTab === "Updates" && <div></div>}
+          {activeTab === "Updates" && (
+            <div>
+              <Updates showButton={true} projectId={uid.address} />
+            </div>
+          )}
         </div>
       )}
     </Layout>

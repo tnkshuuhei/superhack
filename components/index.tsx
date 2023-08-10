@@ -7,3 +7,4 @@ export { default as Button } from "./Button";
 export { default as CustomCard } from "./CustomCard";
 export { default as Forms } from "./Forms";
 export { default as InfoSection } from "./InfoSection";
+export { default as Updates } from "./Updates";

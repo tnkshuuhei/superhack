@@ -12,18 +12,20 @@ const CreateProject: NextPage = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [formState, setFormState] = useState({
+    // Round: "",
     // ProjectName: "",
     // ProjectDescription: "",
-    // publicGoods: "",
-    // sustainability: "",
-    // teamSize: "",
-    // submittedDate: Math.floor(new Date().getTime() / 1000),
-    // links: [],
-    // website: "",
-    // github: "",
+    // PublicGoods: "",
+    // Sustainability: "",
+    // TeamSize: "",
+    // SubmittedDate: Math.floor(new Date().getTime() / 1000),
+    // Links: [],
+    // Website: "",
+    // Github: "",
     // Twitter: "",
     // PayoutAddress: "",
     // ImageUrl: "",
+    // id: null,
     Round: "1",
     ProjectName: "Impact House",
     ProjectDescription: "Impact House is built for digital public goods",
@@ -107,7 +109,7 @@ const CreateProject: NextPage = () => {
               value={formState.ProjectDescription}
             />
             <Forms
-              labelName="Image URL"
+              labelName="Logo URL"
               inputType="text"
               placeholder="Enter Image URL"
               handleChange={(e) => handleChange("ImageUrl", e)}
@@ -155,8 +157,6 @@ const CreateProject: NextPage = () => {
                 value={formState.TeamSize}
               />
             </div>
-            {/* You might need a separate component for an array of links or a dynamic list */}
-
             <Forms
               labelName="How this project impact as public goods?"
               inputType="textarea"

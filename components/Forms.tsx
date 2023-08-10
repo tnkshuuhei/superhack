@@ -7,6 +7,7 @@ interface FormFieldProps {
   inputType?: string;
   isTextArea?: boolean;
   value: string | number;
+  row?: number;
   handleChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   handleTextChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   isDiabled?: boolean;
@@ -18,6 +19,7 @@ const FormField: React.FC<FormFieldProps> = ({
   inputType = "text",
   isTextArea = false,
   value,
+  row = 3,
   handleChange,
   handleTextChange,
   isDiabled = false,
@@ -34,7 +36,7 @@ const FormField: React.FC<FormFieldProps> = ({
           required
           value={value}
           onChange={handleTextChange ? handleTextChange : undefined}
-          rows={3}
+          rows={row}
           placeholder={placeholder}
           className="py-[15px] sm:px-[25px] px-[15px] outline-none border-[1px] border-[#3a3a43] bg-transparent font-epilogue text-[#4b5264] text-[14px] placeholder:text-[#4b5264] rounded-[10px] sm:min-w-[300px]"
         />

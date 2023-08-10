@@ -13,7 +13,7 @@ import {
 } from "@/components";
 import { optimism } from "@/assets";
 import { SCHEMA_UID, formatDecodedData } from "@/utils";
-import { reputation, votes } from "../utils/sampleproject";
+import { votes } from "../utils/sampleproject";
 import { GET_SIMPLE_ATTESTATION, GET_ATTESTATION_BY_REFID } from "../graphql";
 import { useQuery } from "@apollo/client";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -25,6 +25,7 @@ const ProjectPage: NextPage = () => {
   const project_uid = uid.address;
   console.log("project_uid", project_uid);
   const [isLoading, setIsLoading] = useState(false);
+  const [reputation, setReputation] = useState([]);
   const [activeTab, setActiveTab] = useState<string>("About");
   const [textField, setTextField] = useState("");
   const { addAttestation, address, currentChainId } = useStateContext();
@@ -64,15 +65,12 @@ const ProjectPage: NextPage = () => {
   });
   useEffect(() => {
     const fetchData = async () => {
-      if (data && data.attestation) {
+      if (data && data.attestation && project_uid) {
         setIsLoading(true);
         const project_data = await formatDecodedData(data.attestation);
-        const reputation_data =
-          reputationData.attestations.map(formatDecodedData);
         if (project_data) {
           console.log("fetched data:", project_data);
           setProject(project_data);
-          console.log("reputation_data", reputation_data);
         }
         setIsLoading(false);
       }
@@ -80,12 +78,45 @@ const ProjectPage: NextPage = () => {
     console.log("project", project);
     fetchData();
   }, [data]);
+  useEffect(() => {
+    const fetchReputationData = async () => {
+      if (
+        reputationData &&
+        reputationData.attestations.length > 0 &&
+        project_uid
+      ) {
+        const reputation_data =
+          reputationData.attestations.map(formatDecodedData);
+        if (reputation_data) {
+          console.log("reputation_data", reputation_data);
+          setReputation(reputation_data);
+        }
+      }
+    };
+    fetchReputationData();
+  }, [reputationData]);
   const handleChange = (fieldName: string, e: any) => {
     setReputationState({
       ...reputationState,
       [fieldName]: e.target.value,
     });
   };
+  const length = reputationData?.attestations.length;
+  console.log("length", length);
+  const getLengthForTab = (tab: string): number => {
+    switch (tab) {
+      case "Vote":
+        return votes.length;
+      case "Reputation":
+        return reputationData?.attestations.length;
+      case "Updates":
+        // return updates.length;
+        return 0;
+      default:
+        return 0;
+    }
+  };
+
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     console.log("args: ", schemaId, address, reputationState, project_uid);
@@ -123,19 +154,26 @@ const ProjectPage: NextPage = () => {
           </div>
           <div className="flex justify-center items-center">
             <div className="flex flex-row overflow-x-auto whitespace-nowrap md:gap-8 py-4 my-2">
-              {["About", "Vote", "Reputation", "Updates"].map((tab) => (
-                <span
-                  key={tab}
-                  className={`cursor-pointer py-2 px-4 mx-2 text- ${
-                    activeTab === tab
-                      ? "bg-gray-200 text-black rounded-full"
-                      : ""
-                  }`}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tab}
-                </span>
-              ))}
+              {["About", "Vote", "Reputation", "Updates"].map((tab) => {
+                let length;
+                if (tab !== "About") {
+                  length = getLengthForTab(tab);
+                }
+
+                return (
+                  <span
+                    key={tab}
+                    className={`cursor-pointer py-2 px-4 mx-2 text- ${
+                      activeTab === tab
+                        ? "bg-gray-200 text-black rounded-full"
+                        : ""
+                    }`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab} {tab !== "About" && `(${length})`}
+                  </span>
+                );
+              })}
             </div>
           </div>
           {activeTab === "About" && (
@@ -206,15 +244,16 @@ const ProjectPage: NextPage = () => {
             </div>
           )}
           {activeTab === "Vote" && (
-            <CustomCard
-              reviews={votes}
-              baseUrl={"https://sepolia.easscan.org/attestation/view/"}
-            />
+            <div></div>
+            // <CustomCard
+            //   reviews={votes}
+            //   baseUrl={"https://sepolia.easscan.org/attestation/view/"}
+            // />
           )}
           {activeTab === "Reputation" && (
             <CustomCard
               reviews={reputation}
-              baseUrl={"https://sepolia.easscan.org/attestation/view/"}
+              baseUrl={"https://sepolia.easscan.org/attestation/view"}
             />
           )}
 

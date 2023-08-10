@@ -176,16 +176,18 @@ const ProjectPage: NextPage = () => {
             </div>
           )}
           {activeTab === "Vote" && (
-            <CustomCard
-              reviews={votes}
-              baseUrl={"https://sepolia.easscan.org/attestation/view/"}
-            />
+            <div></div>
+            // <CustomCard
+            //   reviews={votes}
+            //   baseUrl={"https://sepolia.easscan.org/attestation/view/"}
+            // />
           )}
           {activeTab === "Reputation" && (
-            <CustomCard
-              reviews={reputation}
-              baseUrl={"https://sepolia.easscan.org/attestation/view/"}
-            />
+            <div></div>
+            // <CustomCard
+            //   reviews={reputation}
+            //   baseUrl={"https://sepolia.easscan.org/attestation/view/"}
+            // />
           )}
 
           {activeTab === "Updates" && (

@@ -3,18 +3,31 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { Button, Layout, Loader, CustomCard, InfoSection } from "@/components";
+import {
+  Button,
+  Layout,
+  Loader,
+  CustomCard,
+  InfoSection,
+  Updates,
+} from "@/components";
 import { optimism } from "@/assets";
-import { formatDecodedData } from "@/utils";
+import { SCHEMA_UID, formatDecodedData } from "@/utils";
 import { reputation, votes } from "../utils/sampleproject";
 import { GET_SIMPLE_ATTESTATION, GET_ALL_ATTESTATIONS_BY_ID } from "../graphql";
 import { useQuery } from "@apollo/client";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useStateContext } from "@/context";
 
 const ProjectPage: NextPage = () => {
+  const router = useRouter();
+  const uid = router.query;
+  const project_uid = uid.address;
+  console.log("project_uid", project_uid);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("About");
-  const [amount, setAmount] = useState("");
+  const [textField, setTextField] = useState("");
+  const { addAttestation, address, currentChainId } = useStateContext();
   const [project, setProject] = useState({
     ProjectName: "",
     ProjectDescription: "",
@@ -31,15 +44,19 @@ const ProjectPage: NextPage = () => {
     ImageUrl: "",
     id: null,
   });
+  const [reputationState, setReputationState] = useState({
+    ProjectUid: project_uid,
+    TextField: "",
+    VerifiedWithWorldid: true,
+  });
+  console.log("reputationState", reputationState);
+  const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
   const { data: session, status } = useSession();
   const loading = status === "loading";
 
-  const router = useRouter();
-  const uid = router.query;
   const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
-    variables: { id: uid.address },
+    variables: { id: project_uid },
   });
-
   useEffect(() => {
     const fetchData = async () => {
       if (data && data.attestation) {
@@ -55,6 +72,26 @@ const ProjectPage: NextPage = () => {
     console.log("project", project);
     fetchData();
   }, [data]);
+  const handleChange = (fieldName: string, e: any) => {
+    setReputationState({
+      ...reputationState,
+      [fieldName]: e.target.value,
+    });
+  };
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    console.log("args: ", schemaId, address, reputationState, project_uid);
+    setIsLoading(true);
+    await addAttestation(
+      schemaId,
+      address,
+      reputationState,
+      "Reputation",
+      project_uid
+    );
+    setIsLoading(false);
+    router.push(`/${project_uid}`);
+  };
   return (
     <Layout>
       {/* {isLoading && <Loader />} */}
@@ -117,7 +154,6 @@ const ProjectPage: NextPage = () => {
                   content={project?.PayoutAddress}
                 />
               </div>
-
               <div className="flex-1 space-y-6">
                 <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
                   <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
@@ -127,7 +163,7 @@ const ProjectPage: NextPage = () => {
                     rows={3}
                     placeholder="I support this project because..."
                     className="w-full p-4 outline-none border rounded-lg bg-white font-epilogue text-black text-[18px] leading-[28px] placeholder-gray-400"
-                    onChange={(e) => setAmount(e.target.value)}
+                    onChange={(e) => handleChange("TextField", e)}
                   ></textarea>
                   <div className="p-6 bg-white rounded-lg space-y-4">
                     <h4 className="font-epilogue font-semibold text-[16px] text-black">
@@ -138,7 +174,8 @@ const ProjectPage: NextPage = () => {
                       a brighter future.
                     </p>
                   </div>
-                  {!session ? (
+                  {/*TODO: should be !session */}
+                  {session ? (
                     <Button
                       btnType="button"
                       title="Sign In with Worldcoin"
@@ -153,7 +190,7 @@ const ProjectPage: NextPage = () => {
                       btnType="button"
                       title="Confirm"
                       styles="w-full bg-gray-700 text-white hover:bg-gray-800"
-                      handleClick={() => {}}
+                      handleClick={(e) => handleSubmit(e)}
                     />
                   )}
                 </div>
@@ -173,7 +210,11 @@ const ProjectPage: NextPage = () => {
             />
           )}
 
-          {activeTab === "Updates" && <div></div>}
+          {activeTab === "Updates" && (
+            <div>
+              <Updates showButton={false} />
+            </div>
+          )}
         </div>
       )}
     </Layout>

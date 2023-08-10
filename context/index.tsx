@@ -34,13 +34,15 @@ export const StateContextProvider = ({ children }: any) => {
     refUID: string = ZERO_BYTES32
   ) => {
     const schemaData = transformFormToSchema(forms, schemaType);
+		console.log("schemaData", schemaData);
     const encodedData = encodeSchemaData(schemaData, schemaType);
+    console.log("encodedData", encodedData);
     const tx = await eas.attest({
       schema: uid,
       data: {
         recipient: recipient,
         expirationTime: BigInt(0),
-        revocable: true,
+        revocable: false, // check here
         data: encodedData,
         refUID: refUID,
       },

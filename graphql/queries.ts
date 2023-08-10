@@ -53,3 +53,18 @@ export const GET_SIMPLE_ATTESTATION = gql`
     }
   }
 `;
+export const GET_ALL_ATTESTATIONS_BY_ID = gql`
+  query Attestations($id: String!) {
+    attestations(where: { id: { equals: $id } }) {
+      decodedDataJson
+      refUID
+      schemaId
+      attester
+      timeCreated
+      txid
+      data
+      recipient
+      id
+    }
+  }
+`;

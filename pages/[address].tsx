@@ -7,7 +7,7 @@ import { Button, Layout, Loader, CustomCard } from "@/components";
 import { optimism } from "@/assets";
 import { formatDecodedData } from "@/utils";
 import { reputation, votes } from "../utils/sampleproject";
-import { GET_SIMPLE_ATTESTATION } from "../graphql";
+import { GET_SIMPLE_ATTESTATION, GET_ALL_ATTESTATIONS_BY_ID } from "../graphql";
 import { useQuery } from "@apollo/client";
 import { signIn, signOut, useSession } from "next-auth/react";
 

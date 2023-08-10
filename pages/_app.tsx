@@ -31,7 +31,7 @@ const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 const { chains, publicClient } = configureChains(
-  [sepolia, optimismGoerli, optimism],
+  [sepolia, optimismGoerli, baseGoerli, optimism /*, base, zora*/],
   [publicProvider()]
 );
 

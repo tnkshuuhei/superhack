@@ -7,7 +7,7 @@ const StateContext = createContext<any>(null);
 import { useEthersSigner } from "./ethers";
 export const StateContextProvider = ({ children }: any) => {
   const { address } = useAccount();
-  const { chain } = useNetwork();
+  const { chain, chains } = useNetwork();
   const [currentChainId, setCurrentChainId] = useState<number>(11155111);
   useEffect(() => {
     if (chain) {

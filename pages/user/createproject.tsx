@@ -78,7 +78,7 @@ const CreateProject: NextPage = () => {
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setIsLoading(true);
-    await addAttestation(uid, address, formState);
+    await addAttestation(uid, address, formState, "Project");
     setIsLoading(false);
     router.push("/user");
   };
@@ -171,7 +171,7 @@ const CreateProject: NextPage = () => {
               inputType="textarea"
               isTextArea={true}
               placeholder="How do you sustain yourself? Please list sources of funding and revenue."
-              handleTextChange={(e) => handleChange("sustainability", e)}
+              handleTextChange={(e) => handleChange("Sustainability", e)}
               value={formState.Sustainability}
             />
             <div>

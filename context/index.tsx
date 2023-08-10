@@ -1,25 +1,22 @@
-import { ethers } from "ethers";
 import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import React, { useState, useContext, createContext, useEffect } from "react";
+import { useNetwork } from "wagmi";
 import { useAccount } from "wagmi";
+import { CONTRACT_ADDRESS, SCHEMA_UID } from "@/utils";
 const StateContext = createContext<any>(null);
-export const EASContractAddress = "0xC2679fBD37d54388Ce493F1DB75320D236e1815e"; // Sepolia v0.26
-const uid =
-  "0xca2804c2e3908ce0d3cc07739b0e84a7df9f0f80b3fafa1e7fdc7c102bcc4cbd";
-import { Decode } from "@/utils";
-import { projects } from "../utils/sampleproject";
-import { useEthersProvider, useEthersSigner } from "./ethers";
+import { useEthersSigner } from "./ethers";
 export const StateContextProvider = ({ children }: any) => {
-  ///////////////////////////////////////
-  // Wagmi hooks
-  ///////////////////////////////////////
-  const { address, isConnecting, isDisconnected } = useAccount();
-  const [decoded, setDecoded] = useState<any>(null);
-  const [project, setProject] = useState(null);
-  const provider: any = ethers.providers.getDefaultProvider("sepolia");
+  const { address } = useAccount();
+  const { chain, chains } = useNetwork();
+  const [currentChainId, setCurrentChainId] = useState<number>(11155111);
+  useEffect(() => {
+    if (chain) {
+      setCurrentChainId(chain.id);
+    }
+  }, [chain]);
+  const EASContractAddress = CONTRACT_ADDRESS[currentChainId];
   const eas = new EAS(EASContractAddress);
-  const signer: any = useEthersSigner({ chainId: 11155111 }); //Sepolia
-  // eas.connect(provider);
+  const signer: any = useEthersSigner({ chainId: currentChainId });
   eas.connect(signer);
 
   // Initialize SchemaEncoder with the schema string
@@ -75,7 +72,7 @@ export const StateContextProvider = ({ children }: any) => {
     <StateContext.Provider
       value={{
         address,
-        decoded,
+        currentChainId,
         addAttestation,
       }}
     >

@@ -1,7 +1,8 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import { StateContextProvider } from "@/context";
+import { StateContextProvider, useStateContext } from "@/context";
+import React, { createContext } from "react";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import {
@@ -13,25 +14,20 @@ import {
   rabbyWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import {
-  optimism,
-  base,
-  baseGoerli,
-  zora,
   sepolia,
-  goerli,
   optimismGoerli,
+  optimism,
+  baseGoerli,
+  base,
+  zora,
 } from "wagmi/chains";
 import { SessionProvider } from "next-auth/react";
 import { publicProvider } from "wagmi/providers/public";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { ApolloProvider } from "@/context/apollo";
 
-const apolloClient = new ApolloClient({
-  uri: "https://sepolia.easscan.org/graphql",
-  cache: new InMemoryCache(),
-});
 const { chains, publicClient } = configureChains(
-  [sepolia, optimismGoerli],
+  [sepolia, optimismGoerli, baseGoerli, optimism /*, base, zora*/],
   [publicProvider()]
 );
 
@@ -56,23 +52,29 @@ const wagmiClient = createConfig({
   connectors,
   publicClient,
 });
+function ComponentWithApolloProvider({ Component, ...props }) {
+  const { currentChainId } = useStateContext();
 
+  return (
+    <ApolloProvider currentChainId={currentChainId}>
+      <Component {...props} />
+    </ApolloProvider>
+  );
+}
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <SessionProvider session={pageProps.session}>
-      <ApolloProvider client={apolloClient}>
-        <WagmiConfig config={wagmiClient}>
-          <RainbowKitProvider
-            chains={chains}
-            initialChain={sepolia}
-            modalSize="compact"
-          >
-            <StateContextProvider>
-              <Component {...pageProps} />
-            </StateContextProvider>
-          </RainbowKitProvider>
-        </WagmiConfig>
-      </ApolloProvider>
+      <WagmiConfig config={wagmiClient}>
+        <RainbowKitProvider
+          chains={chains}
+          initialChain={sepolia}
+          modalSize="compact"
+        >
+          <StateContextProvider>
+            <ComponentWithApolloProvider {...pageProps} Component={Component} />
+          </StateContextProvider>
+        </RainbowKitProvider>
+      </WagmiConfig>
     </SessionProvider>
   );
 }

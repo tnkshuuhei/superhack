@@ -4,13 +4,12 @@ import React, { useState } from "react";
 import { useStateContext } from "../../context";
 import { Layout, Button, Loader, Forms } from "@/components";
 import { useRouter } from "next/router";
-// const uid =
-//   "0x39a85cce69cec29ee89503ff19e6cba1e3647b42392af14fdeea255302ed0c79"; //schema uid
-const uid =
-  "0xfb388c197362bcecd068bdf640604c86424eb55d60fd92d83e27cb6bdb22c7f3"; //schema uid v2
+import { formatDecodedData, SCHEMA_UID } from "@/utils";
 const CreateProject: NextPage = () => {
   const router = useRouter();
-  const { address, decoded, addAttestation } = useStateContext();
+  const { address, addAttestation, currentChainId } = useStateContext();
+  const uid = SCHEMA_UID.PROJECT_SCHEMA[currentChainId];
+
   const [isLoading, setIsLoading] = useState(false);
   const [formState, setFormState] = useState({
     // ProjectName: "",
@@ -42,7 +41,9 @@ const CreateProject: NextPage = () => {
     Github: "https://github.com/tnkshuuhei",
     Twitter: "https://twitter.com/shutanaka_jp",
     PayoutAddress: address,
-    ImageUrl: "https://avatars.githubusercontent.com/u/60056322?s=280&v=4",
+    // ImageUrl: "https://avatars.githubusercontent.com/u/60056322?s=280&v=4",
+    ImageUrl:
+      "https://assets-global.website-files.com/611dbb3c82ba72fbc285d4e2/613267577e2c89636109a8b9_main%20OpenGraph%20image.png",
     // id: null,
   });
   // console.log("formState", formState);

@@ -207,7 +207,7 @@ const ProjectPage: NextPage = () => {
                     <Button
                       btnType="button"
                       title="Confirm"
-                      styles="w-full bg-[#3a3a43]"
+                      styles="w-full bg-[#3a3a43] text-white"
                       handleClick={() => {}}
                     />
                   </div>

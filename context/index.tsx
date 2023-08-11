@@ -3,6 +3,7 @@ import React, { useState, useContext, createContext, useEffect } from "react";
 import { useNetwork } from "wagmi";
 import { useAccount } from "wagmi";
 import {
+  BASE_URL,
   CONTRACT_ADDRESS,
   SCHEMA_UID,
   encodeSchemaData,
@@ -25,7 +26,7 @@ export const StateContextProvider = ({ children }: any) => {
   const eas = new EAS(EASContractAddress);
   const signer: any = useEthersSigner({ chainId: currentChainId });
   eas.connect(signer);
-
+  const baseUrl = BASE_URL[currentChainId];
   const addAttestation = async (
     uid: string,
     recipient: string,
@@ -34,7 +35,7 @@ export const StateContextProvider = ({ children }: any) => {
     refUID: string = ZERO_BYTES32
   ) => {
     const schemaData = transformFormToSchema(forms, schemaType);
-		console.log("schemaData", schemaData);
+    console.log("schemaData", schemaData);
     const encodedData = encodeSchemaData(schemaData, schemaType);
     console.log("encodedData", encodedData);
     const tx = await eas.attest({
@@ -53,12 +54,12 @@ export const StateContextProvider = ({ children }: any) => {
     // console.log("new attestation id", newAttestationID);
     // return newAttestationID;
   };
-
   return (
     <StateContext.Provider
       value={{
         address,
         currentChainId,
+        baseUrl,
         addAttestation,
       }}
     >

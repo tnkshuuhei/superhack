@@ -16,111 +16,104 @@ import { SCHEMA_UID, formatDecodedData, BASE_URL } from "@/utils";
 import { votes } from "../utils/sampleproject";
 import { GET_SIMPLE_ATTESTATION, GET_ATTESTATION_BY_REFID } from "../graphql";
 import { useQuery } from "@apollo/client";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useStateContext } from "@/context";
+type ProjectType = {
+  ProjectName?: string;
+  ProjectDescription?: string;
+  PublicGoods?: string;
+  Sustainability?: string;
+  TeamSize?: string;
+  SubmittedDate?: string;
+  Links?: string[];
+  Website?: string;
+  Github?: string;
+  Twitter?: string;
+  PayoutAddress?: string;
+  Round?: string;
+  ImageUrl?: string;
+  id?: number | null;
+};
 
 const ProjectPage: NextPage = () => {
   const router = useRouter();
-  const uid = router.query;
-  const project_uid = uid.address;
-  console.log("project_uid", project_uid);
-  const [isLoading, setIsLoading] = useState(false);
-  const [reputation, setReputation] = useState([]);
-  const [activeTab, setActiveTab] = useState<string>("About");
-  const [textField, setTextField] = useState("");
   const { addAttestation, address, currentChainId } = useStateContext();
-  const [project, setProject] = useState({
-    ProjectName: "",
-    ProjectDescription: "",
-    PublicGoods: "",
-    Sustainability: "",
-    TeamSize: "",
-    SubmittedDate: "",
-    Links: [],
-    Website: "",
-    Github: "",
-    Twitter: "",
-    PayoutAddress: "",
-    Round: "",
-    ImageUrl: "",
-    id: null,
-  });
+  const project_uid = router.query.address;
+
+  // Project & Reputation States
+  const [project, setProject] = useState<ProjectType>({});
+  const [reputation, setReputation] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("About");
+
+  // Reputation State for the form
   const [reputationState, setReputationState] = useState({
     ProjectUid: project_uid,
     TextField: "",
     VerifiedWithWorldid: true,
   });
-  console.log("reputationState", reputationState);
+
   const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
   const baseUrl = BASE_URL[currentChainId];
   const { data: session, status } = useSession();
-  const loading = status === "loading";
+
+  // Fetch Project Data
+  const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
+    variables: { id: project_uid },
+  });
+
+  // Fetch Reputation Data
   const { data: reputationData } = useQuery(GET_ATTESTATION_BY_REFID, {
     variables: {
       refUID: project_uid,
       schemaId: SCHEMA_UID.REPUTATION_SCHEMA[currentChainId],
     },
   });
-  const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
-    variables: { id: project_uid },
-  });
+
   useEffect(() => {
-    const fetchData = async () => {
-      if (data && data.attestation && project_uid) {
-        setIsLoading(true);
-        const project_data = await formatDecodedData(data.attestation);
-        if (project_data) {
-          console.log("fetched data:", project_data);
-          setProject(project_data);
-        }
-        setIsLoading(false);
-      }
-    };
-    console.log("project", project);
-    fetchData();
-  }, [data]);
+    if (data && data.attestation && project_uid) {
+      setIsLoading(true);
+      const project_data = formatDecodedData(data.attestation);
+      setProject(project_data);
+      setIsLoading(false);
+    }
+  }, [data, project_uid]);
+
   useEffect(() => {
-    const fetchReputationData = async () => {
-      if (
-        reputationData &&
-        reputationData.attestations.length > 0 &&
-        project_uid
-      ) {
-        const reputation_data =
-          reputationData.attestations.map(formatDecodedData);
-        if (reputation_data) {
-          console.log("reputation_data", reputation_data);
-          setReputation(reputation_data);
-        }
-      }
-    };
-    fetchReputationData();
-  }, [reputationData]);
+    if (
+      reputationData &&
+      reputationData.attestations.length > 0 &&
+      project_uid
+    ) {
+      const reputation_data =
+        reputationData.attestations.map(formatDecodedData);
+      setReputation(reputation_data);
+    }
+  }, [reputationData, project_uid]);
+
   const handleChange = (fieldName: string, e: any) => {
-    setReputationState({
-      ...reputationState,
+    setReputationState((prevState) => ({
+      ...prevState,
+      ProjectUid: project_uid,
       [fieldName]: e.target.value,
-    });
+    }));
   };
-  const length = reputationData?.attestations.length;
-  console.log("length", length);
+
   const getLengthForTab = (tab: string): number => {
     switch (tab) {
       case "Vote":
         return votes.length;
       case "Reputation":
-        return reputationData?.attestations.length;
+        return reputationData?.attestations.length ?? 0;
       case "Updates":
-        // return updates.length;
-        return 0;
+        return 0; // Placeholder for potential future data
       default:
         return 0;
     }
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("args: ", schemaId, address, reputationState, project_uid);
     setIsLoading(true);
     await addAttestation(
       schemaId,
@@ -222,7 +215,7 @@ const ProjectPage: NextPage = () => {
                     </p>
                   </div>
                   {/*TODO: should be !session */}
-                  {session ? (
+                  {!session ? (
                     <Button
                       btnType="button"
                       title="Sign In with Worldcoin"

@@ -13,14 +13,20 @@ import {
   Updates,
 } from "@/components";
 import { optimism } from "@/assets";
-import { formatDecodedData } from "@/utils";
+import { formatDecodedData, SCHEMA_UID } from "@/utils";
 import { reputation, votes } from "../../utils/sampleproject";
 import { GET_SIMPLE_ATTESTATION } from "../../graphql";
 import { useQuery } from "@apollo/client";
+import { useStateContext } from "@/context";
 
 const ProjectPage: NextPage = () => {
   const router = useRouter();
   const uid = router.query;
+  const { addAttestation, address, currentChainId } = useStateContext();
+  const project_uid = router.query.address;
+  const schemaId =
+    SCHEMA_UID.PROJECT_APPLICATION_FOR_MILESTONE_GRANT_SCHEMA[currentChainId];
+
   const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
     variables: { id: uid.address },
   });
@@ -44,42 +50,54 @@ const ProjectPage: NextPage = () => {
     id: null,
   });
   const [milestones, setMilestones] = useState({
-    id: uid.address,
-    requestedAmount: "",
-    status: "",
-    description: "",
-    links: [],
-    use: "",
-    address: project.PayoutAddress,
-    approval: "",
-    deadline: "",
+    ProjectUid: project_uid,
+    RequestedAmount: 0,
+    CurrentStatusOfProject: "",
+    MilestoneDescription: "",
+    UseOfFunds: "",
+    ContinueWithLowerAmount: "true",
+    Deadline: 1691744871,
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (data && data.attestation) {
-        setIsLoading(true);
-        const project_data = await formatDecodedData(data.attestation);
-        if (project_data) {
-          console.log("fetched data:", project_data);
-          setProject(project_data);
-        }
-        setIsLoading(false);
-      }
-    };
-    console.log("project", project);
-    fetchData();
+    if (!data || !data.attestation) return;
+    setIsLoading(true);
+    const project_data = formatDecodedData(data.attestation);
+    if (project_data) {
+      setProject(project_data);
+    }
+    setIsLoading(false);
   }, [data]);
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    await addAttestation(
+      schemaId,
+      address,
+      milestones,
+      "MilestoneApplication",
+      project_uid
+    );
+    setIsLoading(false);
+    router.push(`/user/${address}`);
   };
-  const handleChange = (fieldName: string, e: any) => {
-    setMilestones({
-      ...milestones,
-      [fieldName]: e.target.value,
-    });
+  const handleChange = (fieldName: string, value: any) => {
+    let processedValue = value;
+
+    // convert deadline to unix timestamp
+    if (fieldName === "Deadline") {
+      const dateObj = new Date(value);
+      processedValue = Math.floor(dateObj.getTime() / 1000);
+    }
+
+    setMilestones((prevState) => ({
+      ...prevState,
+      ProjectUid: project_uid,
+      [fieldName]: processedValue,
+    }));
   };
+
   return (
     <Layout>
       {isLoading && <Loader />}
@@ -147,30 +165,86 @@ const ProjectPage: NextPage = () => {
                   <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
                     milestone application
                   </p>
-                  <form
-                    onSubmit={handleSubmit}
-                    className="w-full flex flex-col gap-[30px]"
-                  >
-                    <div>
-                      <Forms
-                        labelName="How this project impact as public goods?"
-                        inputType="textarea"
-                        isTextArea={true}
-                        row={2}
-                        placeholder=""
-                        handleTextChange={(e) => handleChange("", e)}
-                        value={""}
-                      />
-                    </div>
-                    <Button
-                      btnType="button"
-                      title="Confirm"
-                      styles="w-full bg-gray-700 text-white hover:bg-gray-800"
-                      handleClick={() => {
-                        handleSubmit;
-                      }}
+
+                  <div>
+                    <Forms
+                      labelName="Description of Milestone"
+                      inputType="textarea"
+                      isTextArea={true}
+                      row={2}
+                      placeholder=""
+                      handleTextChange={(e) =>
+                        handleChange("MilestoneDescription", e.target.value)
+                      }
+                      value={milestones.MilestoneDescription}
                     />
-                  </form>
+                    <Forms
+                      labelName="Current status of your project"
+                      inputType="textarea"
+                      isTextArea={true}
+                      row={2}
+                      placeholder=""
+                      handleTextChange={(e) =>
+                        handleChange("CurrentStatusOfProject", e.target.value)
+                      }
+                      value={milestones.CurrentStatusOfProject}
+                    />
+                    <Forms
+                      labelName="Use of fund"
+                      inputType="textarea"
+                      isTextArea={true}
+                      row={2}
+                      placeholder=""
+                      handleTextChange={(e) =>
+                        handleChange("UseOfFunds", e.target.value)
+                      }
+                      value={milestones.UseOfFunds}
+                    />
+                    <Forms
+                      labelName="Requested Amount"
+                      inputType="input"
+                      isTextArea={false}
+                      placeholder=""
+                      handleChange={(e) =>
+                        handleChange("RequestedAmount", e.target.value)
+                      }
+                      value={milestones.RequestedAmount}
+                    />
+                    <Forms
+                      labelName="Deadline"
+                      inputType="date"
+                      isTextArea={false}
+                      placeholder="deadline of milestone"
+                      handleChange={(e) =>
+                        handleChange("Deadline", e.target.value)
+                      }
+                      value={new Date(milestones.Deadline * 1000)
+                        .toISOString()
+                        .substr(0, 10)}
+                    />
+                    <select
+                      id="confirmation"
+                      onChange={(e) =>
+                        handleChange(
+                          "ContinueWithLowerAmount",
+                          e.target.value === "true"
+                        )
+                      }
+                      value={
+                        milestones.ContinueWithLowerAmount ? "true" : "false"
+                      }
+                      className="w-full bg-white border border-gray-300 rounded-md py-2 px-4 text-gray-700 focus:outline-none focus:border-blue-500 transition duration-150 ease-in-out"
+                    >
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </div>
+                  <Button
+                    btnType="button"
+                    title="Confirm"
+                    styles="w-full bg-gray-700 text-white hover:bg-gray-800"
+                    handleClick={(e) => handleSubmit(e)}
+                  />
                 </div>
               </div>
             </div>

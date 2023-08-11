@@ -36,9 +36,9 @@ const CustomCard: React.FC<CustomCardProps> = ({ reviews, baseUrl }) => {
           className="border p-4 my-2 flex flex-col rounded-xl md:w-3/4"
         >
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
+            <div className="flex md:flex-row flex-col items-center space-x-2">
               <p className="text-left">{review.attester}</p>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-right text-gray-500">
                 Created {formatDate(review.timeCreated)}
               </span>
             </div>

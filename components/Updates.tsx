@@ -12,16 +12,17 @@ const Updates: React.FC<UpdatesProps> = ({
   milestones,
 }) => {
   return (
-    <div>
+    <div className="flex flex-wrap">
       {milestones.length === 0 && (
-        <div className="text-center text-[#808191]">No milestone added yet</div>
+        <div className="w-full text-center text-[#808191]">
+          No milestone added yet
+        </div>
       )}
-      {milestones.map(
-        (milestone, index) => (
-          console.log("Milestone:", milestone.Deadline),
-          (<MilestoneCard key={index} {...milestone} showButton={showButton} />)
-        )
-      )}
+      {milestones.map((milestone, index) => (
+        <div className="w-full lg:w-1/2 p-2" key={index}>
+          <MilestoneCard {...milestone} showButton={showButton} />
+        </div>
+      ))}
     </div>
   );
 };

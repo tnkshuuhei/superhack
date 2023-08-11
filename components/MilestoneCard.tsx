@@ -112,7 +112,7 @@ const MilestoneCard: React.FC<MilestoneProps> = ({
         onClick={() => setIsOpen(!isOpen)}
         className="cursor-pointer flex flex-col space-y-2 transition duration-200 p-2 rounded"
       >
-        <div className="flex gap-4 items-center">
+        <div className="flex md:gap-4 gap-2 items-center">
           <p
             className={`text-xl font-semibold tracking-wide ${
               isReviewDataPresent && isProofDataPresent

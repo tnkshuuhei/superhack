@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
+import CustomButton from "./Button";
 
 interface ModalProps {
   isOpen: boolean;
-  onClose: () => void;
   children: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, children }) => {
   if (!isOpen) return null;
 
   return (
@@ -14,12 +14,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
       <div className="absolute inset-0 bg-black opacity-60"></div>
       <div className="relative p-8 bg-white rounded-lg w-96 max-w-md">
         {children}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1 bg-red-500 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400"
-        >
-          X
-        </button>
       </div>
     </div>
   );

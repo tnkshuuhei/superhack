@@ -37,7 +37,8 @@ type ProjectType = {
 
 const ProjectPage: NextPage = () => {
   const router = useRouter();
-  const { addAttestation, address, currentChainId } = useStateContext();
+  const { addAttestation, address, currentChainId, baseUrl } =
+    useStateContext();
   const project_uid = router.query.address;
 
   // Project & Reputation States
@@ -45,7 +46,7 @@ const ProjectPage: NextPage = () => {
   const [reputation, setReputation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("About");
-
+  const [milestonedata, setMilestoneData] = useState({});
   // Reputation State for the form
   const [reputationState, setReputationState] = useState({
     ProjectUid: project_uid,
@@ -54,7 +55,6 @@ const ProjectPage: NextPage = () => {
   });
 
   const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
-  const baseUrl = BASE_URL[currentChainId];
   const { data: session, status } = useSession();
 
   // Fetch Project Data
@@ -67,6 +67,16 @@ const ProjectPage: NextPage = () => {
     variables: {
       refUID: project_uid,
       schemaId: SCHEMA_UID.REPUTATION_SCHEMA[currentChainId],
+    },
+  });
+  // Fetch Milestone Data
+  const { data: MilestoneData } = useQuery(GET_ATTESTATION_BY_REFID, {
+    variables: {
+      refUID: project_uid,
+      schemaId:
+        SCHEMA_UID.PROJECT_APPLICATION_FOR_MILESTONE_GRANT_SCHEMA[
+          currentChainId
+        ],
     },
   });
 
@@ -90,6 +100,14 @@ const ProjectPage: NextPage = () => {
       setReputation(reputation_data);
     }
   }, [reputationData, project_uid]);
+
+  useEffect(() => {
+    if (!MilestoneData || !MilestoneData.attestations) return;
+    setIsLoading(true);
+    const milestone_data = MilestoneData.attestations.map(formatDecodedData);
+    setMilestoneData(milestone_data);
+    setIsLoading(false);
+  }, [MilestoneData]);
 
   const handleChange = (fieldName: string, e: any) => {
     setReputationState((prevState) => ({
@@ -127,7 +145,7 @@ const ProjectPage: NextPage = () => {
   };
   return (
     <Layout>
-      {/* {isLoading && <Loader />} */}
+      {isLoading && <Loader />}
       {project && (
         <div className="bg-white p-10 rounded-xl">
           <div className="w-full flex md:flex-row flex-col gap-[30px]">
@@ -250,7 +268,11 @@ const ProjectPage: NextPage = () => {
 
           {activeTab === "Updates" && (
             <div>
-              <Updates showButton={false} />
+              <Updates
+                showButton={false}
+                projectId={project_uid}
+                milestones={milestonedata}
+              />
             </div>
           )}
         </div>

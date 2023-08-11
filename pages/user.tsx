@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useStateContext } from "../context";
 import { Layout, ProjectList, Button } from "@/components";
 import { NextPage } from "next";
-import { GET_USER_ATTESTATIONS } from "../graphql";
+import { GET_USER_ATTESTATIONS } from "@/graphql";
 import { useQuery } from "@apollo/client";
 import { formatDecodedData, SCHEMA_UID } from "@/utils";
 

@@ -20,11 +20,10 @@ const ProjectCard = ({
   Twitter,
 }: any) => {
   const username = extractTwitterUsername(Twitter);
-  
 
   return (
     <div
-      className="sm:w-[288px] w-full rounded-[15px] bg-white cursor-pointer"
+      className="sm:w-[288px] w-full rounded-[15px] bg-white cursor-pointer shadow-lg"
       onClick={handleClick}
     >
       <img
@@ -44,11 +43,11 @@ const ProjectCard = ({
         </div>
 
         <div className="flex items-center mt-[20px] gap-[12px]">
-          <div className="w-[30px] h-[30px] rounded-full flex justify-center items-center bg-[#13131a]">
+          <div className="w-[30px] h-[30px] rounded-full flex justify-center items-center overflow-hidden">
             <img
               src={ImageUrl || optimism}
               alt="user"
-              className="object-contain"
+              className="object-cover w-full h-full"
             />
           </div>
           <p className="flex-1 font-epilogue font-semibold text-[14px] truncate">

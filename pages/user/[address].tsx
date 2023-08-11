@@ -3,17 +3,55 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { Button, Layout, Loader, CustomCard } from "@/components";
+import {
+  Button,
+  Layout,
+  Loader,
+  Forms,
+  InfoSection,
+  Updates,
+  CustomCard,
+} from "@/components";
 import { optimism } from "@/assets";
-import { formatDecodedData } from "@/utils";
-import { reputation, votes } from "../../utils/sampleproject";
-import { GET_SIMPLE_ATTESTATION } from "../../graphql";
+import { BASE_URL, formatDecodedData, SCHEMA_UID } from "@/utils";
+import {
+  GET_ATTESTATION_BY_REFID,
+  GET_SIMPLE_ATTESTATION,
+} from "../../graphql";
 import { useQuery } from "@apollo/client";
+import { useStateContext } from "@/context";
 
 const ProjectPage: NextPage = () => {
+  const router = useRouter();
+  const uid = router.query;
+  const { addAttestation, address, currentChainId, baseUrl } =
+    useStateContext();
+  const project_uid = router.query.address;
+  // Fetch Project Data
+  const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
+    variables: { id: project_uid },
+  });
+  // Fetch Reputation Data
+  const { data: reputationData } = useQuery(GET_ATTESTATION_BY_REFID, {
+    variables: {
+      refUID: project_uid,
+      schemaId: SCHEMA_UID.REPUTATION_SCHEMA[currentChainId],
+    },
+  });
+  // Fetch Milestone Data
+  const { data: MilestoneData } = useQuery(GET_ATTESTATION_BY_REFID, {
+    variables: {
+      refUID: project_uid,
+      schemaId:
+        SCHEMA_UID.PROJECT_APPLICATION_FOR_MILESTONE_GRANT_SCHEMA[
+          currentChainId
+        ],
+    },
+  });
+  const [milestonedata, setMilestoneData] = useState({});
+  const [reputation, setReputation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("About");
-  const [amount, setAmount] = useState("");
   const [project, setProject] = useState({
     ProjectName: "",
     ProjectDescription: "",
@@ -30,28 +68,74 @@ const ProjectPage: NextPage = () => {
     ImageUrl: "",
     id: null,
   });
-
-  const router = useRouter();
-  const uid = router.query;
-  const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
-    variables: { id: uid.address },
+  const [milestones, setMilestones] = useState({
+    ProjectUid: project_uid,
+    RequestedAmount: 0,
+    CurrentStatusOfProject: "",
+    MilestoneDescription: "",
+    UseOfFunds: "",
+    ContinueWithLowerAmount: "true",
+    Deadline: 1691744871,
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (data && data.attestation) {
-        setIsLoading(true);
-        const project_data = await formatDecodedData(data.attestation);
-        if (project_data) {
-          console.log("fetched data:", project_data);
-          setProject(project_data);
-        }
-        setIsLoading(false);
-      }
-    };
-    console.log("project", project);
-    fetchData();
+    if (!data || !data.attestation) return;
+    setIsLoading(true);
+    const project_data = formatDecodedData(data.attestation);
+    if (project_data) {
+      setProject(project_data);
+    }
+    setIsLoading(false);
   }, [data]);
+  useEffect(() => {
+    if (
+      reputationData &&
+      reputationData.attestations.length > 0 &&
+      project_uid
+    ) {
+      const reputation_data =
+        reputationData.attestations.map(formatDecodedData);
+      setReputation(reputation_data);
+    }
+  }, [reputationData, project_uid]);
+
+  useEffect(() => {
+    if (!MilestoneData || !MilestoneData.attestations) return;
+    setIsLoading(true);
+    const milestone_data = MilestoneData.attestations.map(formatDecodedData);
+    setMilestoneData(milestone_data);
+    setIsLoading(false);
+  }, [MilestoneData]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    await addAttestation(
+      SCHEMA_UID.PROJECT_APPLICATION_FOR_MILESTONE_GRANT_SCHEMA[currentChainId],
+      address,
+      milestones,
+      "MilestoneApplication",
+      project_uid
+    );
+    setIsLoading(false);
+    router.push(`/user/${address}`);
+  };
+  const handleChange = (fieldName: string, value: any) => {
+    let processedValue = value;
+
+    // convert deadline to unix timestamp
+    if (fieldName === "Deadline") {
+      const dateObj = new Date(value);
+      processedValue = Math.floor(dateObj.getTime() / 1000);
+    }
+
+    setMilestones((prevState) => ({
+      ...prevState,
+      ProjectUid: project_uid,
+      [fieldName]: processedValue,
+    }));
+  };
+
   return (
     <Layout>
       {isLoading && <Loader />}
@@ -93,142 +177,143 @@ const ProjectPage: NextPage = () => {
           {activeTab === "About" && (
             <div className="flex mt-[20px] lg:flex-row flex-col gap-5">
               <div className="flex-[2] flex flex-col gap-[40px]">
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Project Description
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.ProjectDescription}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Public Goods
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.PublicGoods}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Sustainability
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.Sustainability}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Team Size
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.TeamSize}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Website
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.Website}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Github
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.Github}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Twitter
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.Twitter}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                    Payout Address
-                  </h4>
-                  <div className="mt-[20px]">
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
-                      {project?.PayoutAddress}
-                    </p>
-                  </div>
-                </div>
+                <InfoSection
+                  title="Project Description"
+                  content={project?.ProjectDescription}
+                />
+                <InfoSection
+                  title="Public Goods"
+                  content={project?.PublicGoods}
+                />
+                <InfoSection
+                  title="Sustainability"
+                  content={project?.Sustainability}
+                />
+                <InfoSection title="Team Size" content={project?.TeamSize} />
+                <InfoSection title="Website" content={project?.Website} />
+                <InfoSection title="Github" content={project?.Github} />
+                <InfoSection title="Twitter" content={project?.Twitter} />
+                <InfoSection
+                  title="Payout Address"
+                  content={project?.PayoutAddress}
+                />
               </div>
-              <div className="flex-1">
-                <h4 className="font-epilogue font-semibold text-[18px] text-black uppercase">
-                  Add Reputation
-                </h4>
-
-                <div className="mt-[20px] flex flex-col p-4 bg-gray-200 rounded-[10px]">
-                  <p className="font-epilogue fount-medium text-[20px] leading-[30px] text-center text-black">
-                    Attest to the project reputation
+              <div className="flex-1 space-y-6 ">
+                <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
+                  <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
+                    milestone application
                   </p>
-                  <div className="mt-[30px]">
-                    <textarea
-                      rows={3}
-                      placeholder="I support this project because..."
-                      className="w-full py-[10px] sm:px-[20px] px-[15px] outline-none border-[1px] border-[#3a3a43] bg-transparent font-epilogue text-[#808191] text-[18px] leading-[30px] placeholder:text-[#4b5264] rounded-[10px]"
-                      onChange={(e) => setAmount(e.target.value)}
-                    ></textarea>
 
-                    <div className="my-[20px] p-4 bg-[#13131a] rounded-[10px]">
-                      <h4 className="font-epilogue font-semibold text-[14px] leading-[22px] text-white">
-                        Show gratitude with action.
-                      </h4>
-                      <p className="mt-[20px] font-epilogue font-normal leading-[22px] text-[#808191]">
-                        Share your impressions and experiences to pave the way
-                        for a brighter future.
-                      </p>
-                    </div>
-                    <Button
-                      btnType="button"
-                      title="Confirm"
-                      styles="w-full bg-[#3a3a43] text-white"
-                      handleClick={() => {}}
+                  <div className="space-y-4">
+                    <Forms
+                      labelName="Description of Milestone"
+                      inputType="textarea"
+                      isTextArea={true}
+                      row={2}
+                      placeholder=""
+                      handleTextChange={(e) =>
+                        handleChange("MilestoneDescription", e.target.value)
+                      }
+                      value={milestones.MilestoneDescription}
                     />
+                    <Forms
+                      labelName="Current status of your project"
+                      inputType="textarea"
+                      isTextArea={true}
+                      row={2}
+                      placeholder=""
+                      handleTextChange={(e) =>
+                        handleChange("CurrentStatusOfProject", e.target.value)
+                      }
+                      value={milestones.CurrentStatusOfProject}
+                    />
+                    <Forms
+                      labelName="Use of fund"
+                      inputType="textarea"
+                      isTextArea={true}
+                      row={2}
+                      placeholder=""
+                      handleTextChange={(e) =>
+                        handleChange("UseOfFunds", e.target.value)
+                      }
+                      value={milestones.UseOfFunds}
+                    />
+                    <Forms
+                      labelName="Requested Amount"
+                      inputType="input"
+                      isTextArea={false}
+                      placeholder=""
+                      handleChange={(e) =>
+                        handleChange("RequestedAmount", e.target.value)
+                      }
+                      value={milestones.RequestedAmount}
+                    />
+                    <Forms
+                      labelName="Deadline"
+                      inputType="date"
+                      isTextArea={false}
+                      placeholder="deadline of milestone"
+                      handleChange={(e) =>
+                        handleChange("Deadline", e.target.value)
+                      }
+                      value={new Date(milestones.Deadline * 1000)
+                        .toISOString()
+                        .substr(0, 10)}
+                    />
+                    <div>
+                      <span className="font-epilogue font-medium text-[14px] leading-[22px] text-[#808191]">
+                        continue if the approved amount is lower than requested?
+                      </span>
+                      <select
+                        id="confirmation"
+                        onChange={(e) =>
+                          handleChange(
+                            "ContinueWithLowerAmount",
+                            e.target.value === "true"
+                          )
+                        }
+                        value={
+                          milestones.ContinueWithLowerAmount ? "true" : "false"
+                        }
+                        className="mt-[12px] w-full bg-white border border-gray-300 rounded-md py-2 px-4 text-gray-700 focus:outline-none focus:border-blue-500 transition duration-150 ease-in-out"
+                      >
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                      </select>
+                    </div>
                   </div>
+                  <Button
+                    btnType="button"
+                    title="Confirm"
+                    styles="w-full bg-gray-700 text-white hover:bg-gray-800"
+                    handleClick={(e) => handleSubmit(e)}
+                  />
                 </div>
               </div>
             </div>
           )}
           {activeTab === "Vote" && (
-            <CustomCard
-              reviews={votes}
-              baseUrl={"https://sepolia.easscan.org/attestation/view/"}
-            />
+            <div></div>
+            // <CustomCard
+            //   reviews={votes}
+            //   baseUrl={"https://sepolia.easscan.org/attestation/view/"}
+            // />
           )}
           {activeTab === "Reputation" && (
-            <CustomCard
-              reviews={reputation}
-              baseUrl={"https://sepolia.easscan.org/attestation/view/"}
-            />
+            <div>
+              <CustomCard reviews={reputation} baseUrl={baseUrl} />
+            </div>
           )}
 
-          {activeTab === "Updates" && <div></div>}
+          {activeTab === "Updates" && (
+            <div>
+              <Updates
+                showButton={true}
+                projectId={uid.address}
+                milestones={milestonedata}
+              />
+            </div>
+          )}
         </div>
       )}
     </Layout>

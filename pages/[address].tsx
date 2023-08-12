@@ -17,6 +17,7 @@ import { SCHEMA_UID, formatDecodedData, BASE_URL } from "@/utils";
 import { GET_SIMPLE_ATTESTATION, GET_ATTESTATION_BY_REFID } from "../graphql";
 import { useQuery } from "@apollo/client";
 import { signIn, useSession } from "next-auth/react";
+import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
 import { useStateContext } from "@/context";
 type ProjectType = {
   ProjectName?: string;
@@ -51,8 +52,17 @@ const ProjectPage: NextPage = () => {
     useStateContext();
 
   // WorldId Session
+  const [worldproof, setWorldProof] = useState<ISuccessResult>();
   const { data: session, status } = useSession();
   console.log("session", session);
+  const onSuccess = (result: ISuccessResult) => {
+    console.log("verified: ", result);
+    setWorldProof(result);
+  };
+  console.log("worldproof", worldproof);
+  const handleVerify = (proof) => {
+    console.log("proof", proof);
+  };
 
   // Project & Reputation States
   const [project, setProject] = useState<ProjectType>({});
@@ -312,9 +322,25 @@ const ProjectPage: NextPage = () => {
                         for a brighter future.
                       </p>
                     </div>
-                    {/*TODO: should be !session */}
-                    {!session ? (
-                      <Button
+
+                    <IDKitWidget
+                      app_id="app_staging_e21cd92348d6ce379c0eb3da04148646" // obtained from the Developer Portal
+                      action="superhack" // this is your action name from the Developer Portal
+                      signal="user_value" // any arbitrary value the user is committing to, e.g. a vote
+                      onSuccess={onSuccess}
+                      credential_types={[]} // we recommend only allowing orb verification on-chain
+                      enableTelemetry
+                    >
+                      {({ open }) => (
+                        <Button
+                          btnType="button"
+                          title="Verify with World ID"
+                          styles="text-black bg-white hover:bg-gray-100 w-full"
+                          handleClick={open}
+                        ></Button>
+                      )}
+                    </IDKitWidget>
+                    {/* <Button
                         btnType="button"
                         title="Sign In with Worldcoin"
                         styles="w-full bg-white text-black"
@@ -322,15 +348,13 @@ const ProjectPage: NextPage = () => {
                           e.preventDefault();
                           signIn("worldcoin");
                         }}
-                      />
-                    ) : (
-                      <Button
-                        btnType="button"
-                        title="Confirm"
-                        styles="w-full bg-gray-700 text-white hover:bg-gray-800"
-                        handleClick={(e) => handleSubmit(e)}
-                      />
-                    )}
+                      /> */}
+                    {/* <Button
+                      btnType="button"
+                      title="Confirm"
+                      styles="w-full bg-gray-700 text-white hover:bg-gray-800"
+                      handleClick={(e) => handleSubmit(e)}
+                    /> */}
                   </div>
                 </div>
               ) : (

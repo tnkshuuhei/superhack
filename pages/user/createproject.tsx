@@ -48,7 +48,7 @@ const CreateProject: NextPage = () => {
       "https://assets-global.website-files.com/611dbb3c82ba72fbc285d4e2/613267577e2c89636109a8b9_main%20OpenGraph%20image.png",
     // id: null,
   });
-  // console.log("formState", formState);
+
   const addLink = () => {
     setFormState((prevState: any) => ({
       ...prevState,
@@ -74,13 +74,18 @@ const CreateProject: NextPage = () => {
     });
   };
 
-  // TODO: add a attest function to attest project application
   const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    setIsLoading(true);
-    await addAttestation(uid, address, formState, "Project");
-    setIsLoading(false);
-    router.push("/user");
+    try {
+      e.preventDefault();
+      setIsLoading(true);
+      await addAttestation(uid, address, formState, "Project");
+      setIsLoading(false);
+      router.push("/user");
+    } catch (e) {
+      console.log(e);
+      setIsLoading(false);
+      router.push("/user");
+    }
   };
 
   return (

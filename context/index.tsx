@@ -1,6 +1,6 @@
 import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import React, { useState, useContext, createContext, useEffect } from "react";
-import { useNetwork } from "wagmi";
+import { useEnsName, useNetwork } from "wagmi";
 import { useAccount } from "wagmi";
 import {
   BASE_URL,
@@ -14,7 +14,10 @@ import { useEthersSigner } from "./ethers";
 const ZERO_BYTES32 =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 export const StateContextProvider = ({ children }: any) => {
-  const { address } = useAccount();
+  const { address: addr } = useAccount();
+  const { data: ENSname } = useEnsName({ address: addr });
+  const address = ENSname ? ENSname : addr;
+  console.log("Address: ", address);
   const { chain, chains } = useNetwork();
   const [currentChainId, setCurrentChainId] = useState<number>(11155111);
   useEffect(() => {
@@ -35,24 +38,27 @@ export const StateContextProvider = ({ children }: any) => {
     refUID: string = ZERO_BYTES32
   ) => {
     const schemaData = transformFormToSchema(forms, schemaType);
-    console.log("schemaData", schemaData);
-    const encodedData = encodeSchemaData(schemaData, schemaType);
-    console.log("encodedData", encodedData);
-    const tx = await eas.attest({
-      schema: uid,
-      data: {
-        recipient: recipient,
-        expirationTime: BigInt(0),
-        revocable: false, // check here
-        data: encodedData,
-        refUID: refUID,
-      },
-    });
-    console.log("tx", tx);
 
-    // const newAttestationID = await tx.wait();
-    // console.log("new attestation id", newAttestationID);
-    // return newAttestationID;
+    const encodedData = encodeSchemaData(schemaData, schemaType);
+
+    try {
+      const tx = await eas.attest({
+        schema: uid,
+        data: {
+          recipient: recipient,
+          expirationTime: BigInt(0),
+          revocable: false, // check here
+          data: encodedData,
+          refUID: refUID,
+        },
+      });
+      console.log("tx", tx);
+      const newAttestationID = await tx.wait();
+      console.log("new attestation id", newAttestationID);
+      return newAttestationID;
+    } catch (e) {
+      console.log(e);
+    }
   };
   return (
     <StateContext.Provider

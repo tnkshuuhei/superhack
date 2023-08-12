@@ -48,6 +48,14 @@ const ProjectPage: NextPage = () => {
         ],
     },
   });
+  // Fetch Vote Data
+  const { data: VoteData } = useQuery(GET_ATTESTATION_BY_REFID, {
+    variables: {
+      refUID: project_uid,
+      schemaId: SCHEMA_UID.EVALUATION_AND_VOTING_SCHEMA[currentChainId],
+    },
+  });
+
   const [milestonedata, setMilestoneData] = useState({});
   const [reputation, setReputation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,12 +88,10 @@ const ProjectPage: NextPage = () => {
 
   useEffect(() => {
     if (!data || !data.attestation) return;
-    setIsLoading(true);
     const project_data = formatDecodedData(data.attestation);
     if (project_data) {
       setProject(project_data);
     }
-    setIsLoading(false);
   }, [data]);
   useEffect(() => {
     if (
@@ -101,24 +107,35 @@ const ProjectPage: NextPage = () => {
 
   useEffect(() => {
     if (!MilestoneData || !MilestoneData.attestations) return;
-    setIsLoading(true);
     const milestone_data = MilestoneData.attestations.map(formatDecodedData);
     setMilestoneData(milestone_data);
-    setIsLoading(false);
   }, [MilestoneData]);
-
+  const [votes, setVotes] = useState([]);
+  useEffect(() => {
+    if (!VoteData || !VoteData.attestations) return;
+    const vote_data = VoteData.attestations.map(formatDecodedData);
+    setVotes(vote_data);
+  }, [VoteData]);
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    await addAttestation(
-      SCHEMA_UID.PROJECT_APPLICATION_FOR_MILESTONE_GRANT_SCHEMA[currentChainId],
-      address,
-      milestones,
-      "MilestoneApplication",
-      project_uid
-    );
-    setIsLoading(false);
-    router.push(`/user/${address}`);
+    try {
+      e.preventDefault();
+      setIsLoading(true);
+      await addAttestation(
+        SCHEMA_UID.PROJECT_APPLICATION_FOR_MILESTONE_GRANT_SCHEMA[
+          currentChainId
+        ],
+        address,
+        milestones,
+        "MilestoneApplication",
+        project_uid
+      );
+      setIsLoading(false);
+      router.push(`/user/${address}`);
+    } catch (e) {
+      setIsLoading(false);
+      router.push(`/user/${address}`);
+      console.log(e);
+    }
   };
   const handleChange = (fieldName: string, value: any) => {
     let processedValue = value;
@@ -135,7 +152,18 @@ const ProjectPage: NextPage = () => {
       [fieldName]: processedValue,
     }));
   };
-
+  const getLengthForTab = (tab: string): number => {
+    switch (tab) {
+      case "Vote":
+        return votes.length;
+      case "Reputation":
+        return reputationData?.attestations.length ?? 0;
+      case "Updates":
+        return MilestoneData?.attestations.length ?? 0;
+      default:
+        return 0;
+    }
+  };
   return (
     <Layout>
       {isLoading && <Loader />}
@@ -159,19 +187,26 @@ const ProjectPage: NextPage = () => {
           </div>
           <div className="flex justify-center items-center">
             <div className="flex flex-row overflow-x-auto whitespace-nowrap md:gap-8 py-4 my-2">
-              {["About", "Vote", "Reputation", "Updates"].map((tab) => (
-                <span
-                  key={tab}
-                  className={`cursor-pointer py-2 px-4 mx-2 text- ${
-                    activeTab === tab
-                      ? "bg-gray-200 text-black rounded-full"
-                      : ""
-                  }`}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tab}
-                </span>
-              ))}
+              {["About", "Vote", "Reputation", "Updates"].map((tab) => {
+                let length;
+                if (tab !== "About") {
+                  length = getLengthForTab(tab);
+                }
+
+                return (
+                  <span
+                    key={tab}
+                    className={`cursor-pointer py-2 px-4 mx-2 text- ${
+                      activeTab === tab
+                        ? "bg-gray-200 text-black rounded-full"
+                        : ""
+                    }`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab} {tab !== "About" && `(${length})`}
+                  </span>
+                );
+              })}
             </div>
           </div>
           {activeTab === "About" && (
@@ -293,11 +328,7 @@ const ProjectPage: NextPage = () => {
             </div>
           )}
           {activeTab === "Vote" && (
-            <div></div>
-            // <CustomCard
-            //   reviews={votes}
-            //   baseUrl={"https://sepolia.easscan.org/attestation/view/"}
-            // />
+            <CustomCard reviews={votes} baseUrl={baseUrl} />
           )}
           {activeTab === "Reputation" && (
             <div>

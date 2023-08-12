@@ -18,6 +18,7 @@ const ProjectCard = ({
   ImageUrl,
   handleClick,
   Twitter,
+  matchingAmount,
 }: any) => {
   const username = extractTwitterUsername(Twitter);
 
@@ -41,7 +42,13 @@ const ProjectCard = ({
             {ProjectDescription}
           </p>
         </div>
-
+        <div className="flex justify-between flex-wrap mt-[15px] gap-2">
+          <div className="flex flex-col">
+            <h4 className="font-epilogue font-semibold text-[14px] text-[#808191] leading-[22px]">
+              Raised of ${matchingAmount}
+            </h4>
+          </div>
+        </div>
         <div className="flex items-center mt-[20px] gap-[12px]">
           <div className="w-[30px] h-[30px] rounded-full flex justify-center items-center overflow-hidden">
             <img

@@ -124,7 +124,7 @@ const ProjectPage: NextPage = () => {
       case "Reputation":
         return reputationData?.attestations.length ?? 0;
       case "Updates":
-        return 0; // Placeholder for potential future data
+        return MilestoneData?.attestations.length ?? 0;
       default:
         return 0;
     }

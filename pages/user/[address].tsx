@@ -135,7 +135,18 @@ const ProjectPage: NextPage = () => {
       [fieldName]: processedValue,
     }));
   };
-
+  const getLengthForTab = (tab: string): number => {
+    switch (tab) {
+      case "Vote":
+        return 0;
+      case "Reputation":
+        return reputationData?.attestations.length ?? 0;
+      case "Updates":
+        return MilestoneData?.attestations.length ?? 0;
+      default:
+        return 0;
+    }
+  };
   return (
     <Layout>
       {isLoading && <Loader />}
@@ -159,19 +170,26 @@ const ProjectPage: NextPage = () => {
           </div>
           <div className="flex justify-center items-center">
             <div className="flex flex-row overflow-x-auto whitespace-nowrap md:gap-8 py-4 my-2">
-              {["About", "Vote", "Reputation", "Updates"].map((tab) => (
-                <span
-                  key={tab}
-                  className={`cursor-pointer py-2 px-4 mx-2 text- ${
-                    activeTab === tab
-                      ? "bg-gray-200 text-black rounded-full"
-                      : ""
-                  }`}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tab}
-                </span>
-              ))}
+              {["About", "Vote", "Reputation", "Updates"].map((tab) => {
+                let length;
+                if (tab !== "About") {
+                  length = getLengthForTab(tab);
+                }
+
+                return (
+                  <span
+                    key={tab}
+                    className={`cursor-pointer py-2 px-4 mx-2 text- ${
+                      activeTab === tab
+                        ? "bg-gray-200 text-black rounded-full"
+                        : ""
+                    }`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab} {tab !== "About" && `(${length})`}
+                  </span>
+                );
+              })}
             </div>
           </div>
           {activeTab === "About" && (

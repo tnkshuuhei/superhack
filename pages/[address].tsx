@@ -14,7 +14,6 @@ import {
 } from "@/components";
 import { optimism } from "@/assets";
 import { SCHEMA_UID, formatDecodedData, BASE_URL } from "@/utils";
-import { votes } from "../utils/sampleproject";
 import {
   GET_SIMPLE_ATTESTATION,
   GET_ATTESTATION_BY_REFID,

@@ -1,8 +1,8 @@
 "use client";
+import React from "react";
+import { ethers } from "ethers";
 type Review = {
-  content?: string;
-  userAddress?: string;
-  number?: number;
+  AllocatedAmountsOfPoints?: ethers.BigNumber;
   timeCreated: string;
   uid?: string;
   ProjectUid?: string;
@@ -16,43 +16,54 @@ type CustomCardProps = {
   baseUrl?: string;
 };
 
-import React from "react";
 const formatDate = (unixTimestamp: string) => {
   const date = new Date(Number(unixTimestamp) * 1000);
-  return date.toLocaleString();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${month}/${day}/${year}`;
 };
 
 const CustomCard: React.FC<CustomCardProps> = ({ reviews, baseUrl }) => {
   return (
-    <div className="flex flex-col items-center">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-screen-xl mx-auto p-4">
       {reviews.length === 0 && (
-        <div className="text-center text-[#808191]">
-          No reputation added yet
+        <div className="text-center text-gray-400 font-medium col-span-2">
+          Not yet added
         </div>
       )}
       {reviews.map((review, index) => (
         <div
           key={index}
-          className="border p-4 my-2 flex flex-col rounded-xl md:w-3/4"
+          className="border p-6 bg-white shadow-md rounded-xl w-full"
         >
-          <div className="flex justify-between items-center">
-            <div className="flex md:flex-row flex-col items-center space-x-2">
-              <p className="text-left">{review.attester}</p>
-              <span className="text-sm text-right text-gray-500">
-                Created {formatDate(review.timeCreated)}
-              </span>
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+              <p className="md:font-medium text-xs">{review.attester}</p>
+              <div className="gap-2 flex flex-row items-center">
+                <span className="text-xs text-gray-500">
+                  {formatDate(review.timeCreated)}
+                </span>
+                {/* not good idea?? */}
+                {/* {review.AllocatedAmountsOfPoints && (
+                  <span className="md:text-xl font-medium text-blue-500">
+                    {ethers.utils.formatUnits(
+                      review.AllocatedAmountsOfPoints,
+                      0
+                    )}
+                    pt
+                  </span>
+                )} */}
+              </div>
             </div>
-            {review.number && (
-              <span className="text-right">{review.number}pt</span>
-            )}
           </div>
-          <p className="text-left text-[#808191] mb-2">{review.TextField}</p>
-          <div className="mt-2">
+          <p className="text-gray-500 mb-4">{review.TextField}</p>
+          <div>
             <a
               href={`${baseUrl}/${review.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#808191] hover:text-[#606060] hover:underline"
+              className="text-blue-500 hover:underline"
             >
               view attestation
             </a>

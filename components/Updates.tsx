@@ -14,8 +14,8 @@ const Updates: React.FC<UpdatesProps> = ({
   return (
     <div className="flex flex-wrap">
       {milestones.length === 0 && (
-        <div className="w-full text-center text-[#808191]">
-          No milestone added yet
+        <div className="w-full text-center text-gray-400 font-medium">
+          Not yet added
         </div>
       )}
       {milestones.map((milestone, index) => (

@@ -47,5 +47,9 @@ const SCHEMA_UID = {
     420: "0x599fd25836ecb7e9ddd7381b35d3d76925a8c2c2aef4f985ff281664500f37e4", // op-goerli
     10: "0x599fd25836ecb7e9ddd7381b35d3d76925a8c2c2aef4f985ff281664500f37e4", // Optimism
   },
+  ROUND_SCHEMA: {
+    11155111:
+      "0xfed37cf7dcb7b91ab50bb2e3535eca537f7fdb6f5d541d96c621828aed104810", // Sepolia
+  },
 };
 export default SCHEMA_UID;

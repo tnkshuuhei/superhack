@@ -19,16 +19,14 @@ const User: NextPage = () => {
   });
   useEffect(() => {
     if (data && data.attestations) {
-      setIsLoading(true);
       const formattedData = data.attestations.map(formatDecodedData);
       setAttestationsData(formattedData);
-      setIsLoading(false);
     }
   }, [data]);
   const handleClick = () => {
     router.push("/user/createproject");
   };
-  console.log("created projects", attestationsData);
+
   return (
     <Layout>
       {attestationsData.length > 0 ? (

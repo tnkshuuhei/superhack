@@ -10,11 +10,16 @@ import {
   CustomCard,
   InfoSection,
   Updates,
+  Forms,
 } from "@/components";
 import { optimism } from "@/assets";
 import { SCHEMA_UID, formatDecodedData, BASE_URL } from "@/utils";
 import { votes } from "../utils/sampleproject";
-import { GET_SIMPLE_ATTESTATION, GET_ATTESTATION_BY_REFID } from "../graphql";
+import {
+  GET_SIMPLE_ATTESTATION,
+  GET_ATTESTATION_BY_REFID,
+  GET_ALL_ATTESTATIONS,
+} from "../graphql";
 import { useQuery } from "@apollo/client";
 import { signIn, useSession } from "next-auth/react";
 import { useStateContext } from "@/context";
@@ -34,7 +39,16 @@ type ProjectType = {
   ImageUrl?: string;
   id?: number | null;
 };
-
+type RoundInfoType = {
+  Organization: string;
+  GrantPool: number;
+  BudgeHolders: string[];
+};
+type VoteType = {
+  ProjectUid: any;
+  AllocatedAmountsOfPoints: number;
+  TextField: string;
+};
 const ProjectPage: NextPage = () => {
   const router = useRouter();
   const { addAttestation, address, currentChainId, baseUrl } =
@@ -53,7 +67,12 @@ const ProjectPage: NextPage = () => {
     TextField: "",
     VerifiedWithWorldid: true,
   });
-
+  // Vote State for the form
+  const [voteState, setVoteState] = useState({
+    ProjectUid: project_uid,
+    AllocatedAmountsOfPoints: 0,
+    TextField: "",
+  });
   const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
   const { data: session, status } = useSession();
 
@@ -79,13 +98,39 @@ const ProjectPage: NextPage = () => {
         ],
     },
   });
+  // Fetch Vote Data
+  const { data: VoteData } = useQuery(GET_ATTESTATION_BY_REFID, {
+    variables: {
+      refUID: project_uid,
+      schemaId: SCHEMA_UID.EVALUATION_AND_VOTING_SCHEMA[currentChainId],
+    },
+  });
+  // Fetch Round Data
+  // Ideally we should be able to fetch the all rounds data and match each project,
+  // and project schema has a round refUID of the round schema
+  const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
+    variables: {
+      id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
+    },
+  });
+  const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
+    Organization: "",
+    GrantPool: 0,
+    BudgeHolders: [],
+  });
+  useEffect(() => {
+    if (roundData) {
+      const roundattestation = formatDecodedData(roundData.attestation);
+      setRoundInfo(roundattestation);
+      console.log("roundattestation", roundattestation);
+    }
+  }, [roundData, address]);
 
+  const isBudgetHolder: boolean = roundInfo.BudgeHolders.includes(address);
   useEffect(() => {
     if (data && data.attestation && project_uid) {
-      setIsLoading(true);
       const project_data = formatDecodedData(data.attestation);
       setProject(project_data);
-      setIsLoading(false);
     }
   }, [data, project_uid]);
 
@@ -100,13 +145,17 @@ const ProjectPage: NextPage = () => {
       setReputation(reputation_data);
     }
   }, [reputationData, project_uid]);
+  const [votes, setVotes] = useState([]);
+  useEffect(() => {
+    if (!VoteData || !VoteData.attestations) return;
+    const vote_data = VoteData.attestations.map(formatDecodedData);
 
+    setVotes(vote_data);
+  }, [VoteData]);
   useEffect(() => {
     if (!MilestoneData || !MilestoneData.attestations) return;
-    setIsLoading(true);
     const milestone_data = MilestoneData.attestations.map(formatDecodedData);
     setMilestoneData(milestone_data);
-    setIsLoading(false);
   }, [MilestoneData]);
 
   const handleChange = (fieldName: string, e: any) => {
@@ -116,7 +165,53 @@ const ProjectPage: NextPage = () => {
       [fieldName]: e.target.value,
     }));
   };
-
+  const handleVoteChange = (fieldName: string, e: any) => {
+    setVoteState((prevState) => ({
+      ...prevState,
+      ProjectUid: project_uid,
+      [fieldName]: e.target.value,
+    }));
+  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    try {
+      setIsLoading(true);
+      await addAttestation(
+        schemaId,
+        address,
+        reputationState,
+        "Reputation",
+        project_uid
+      );
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
+      router.push(`/${project_uid}`);
+      console.log(e);
+    }
+    e.preventDefault();
+  };
+  const handleVoteSubmit = async (e: React.FormEvent) => {
+    if (voteState.AllocatedAmountsOfPoints === 0) {
+      console.log("You need to allocate points more than 0 to vote");
+    } else {
+      try {
+        e.preventDefault();
+        setIsLoading(true);
+        await addAttestation(
+          SCHEMA_UID.EVALUATION_AND_VOTING_SCHEMA[currentChainId],
+          address,
+          voteState,
+          "Evaluation",
+          project_uid
+        );
+        setIsLoading(false);
+        router.push(`/${project_uid}`);
+      } catch (e) {
+        setIsLoading(false);
+        console.log(e);
+      }
+    }
+  };
   const getLengthForTab = (tab: string): number => {
     switch (tab) {
       case "Vote":
@@ -128,20 +223,6 @@ const ProjectPage: NextPage = () => {
       default:
         return 0;
     }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    await addAttestation(
-      schemaId,
-      address,
-      reputationState,
-      "Reputation",
-      project_uid
-    );
-    setIsLoading(false);
-    router.push(`/${project_uid}`);
   };
   return (
     <Layout>
@@ -212,68 +293,103 @@ const ProjectPage: NextPage = () => {
                   content={project?.PayoutAddress}
                 />
               </div>
-              <div className="flex-1 space-y-6">
-                <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
-                  <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
-                    Add Reputation
-                  </p>
-                  <textarea
-                    rows={3}
-                    placeholder="I support this project because..."
-                    className="w-full p-4 outline-none border rounded-lg bg-white font-epilogue text-black text-[18px] leading-[28px] placeholder-gray-400"
-                    onChange={(e) => handleChange("TextField", e)}
-                  ></textarea>
-                  <div className="p-6 bg-white rounded-lg space-y-4">
-                    <h4 className="font-epilogue font-semibold text-[16px] text-black">
-                      Show gratitude with action.
-                    </h4>
-                    <p className="font-epilogue font-normal text-gray-600">
-                      Share your impressions and experiences to pave the way for
-                      a brighter future.
+              {!isBudgetHolder ? (
+                <div className="flex-1 space-y-6">
+                  <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
+                    <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
+                      Add Reputation
                     </p>
+                    <textarea
+                      rows={3}
+                      placeholder="I support this project because..."
+                      className="w-full p-4 outline-none border rounded-lg bg-white font-epilogue text-black text-[18px] leading-[28px] placeholder-gray-400"
+                      onChange={(e) => handleChange("TextField", e)}
+                    ></textarea>
+                    <div className="p-6 bg-white rounded-lg space-y-4">
+                      <h4 className="font-epilogue font-semibold text-[16px] text-black">
+                        Show gratitude with action.
+                      </h4>
+                      <p className="font-epilogue font-normal text-gray-600">
+                        Share your impressions and experiences to pave the way
+                        for a brighter future.
+                      </p>
+                    </div>
+                    {/*TODO: should be !session */}
+                    {!session ? (
+                      <Button
+                        btnType="button"
+                        title="Sign In with Worldcoin"
+                        styles="w-full bg-white text-black"
+                        handleClick={(e) => {
+                          e.preventDefault();
+                          signIn("worldcoin");
+                        }}
+                      />
+                    ) : (
+                      <Button
+                        btnType="button"
+                        title="Confirm"
+                        styles="w-full bg-gray-700 text-white hover:bg-gray-800"
+                        handleClick={(e) => handleSubmit(e)}
+                      />
+                    )}
                   </div>
-                  {/*TODO: should be !session */}
-                  {!session ? (
-                    <Button
-                      btnType="button"
-                      title="Sign In with Worldcoin"
-                      styles="w-full bg-white text-black"
-                      handleClick={(e) => {
-                        e.preventDefault();
-                        signIn("worldcoin");
-                      }}
-                    />
-                  ) : (
-                    <Button
-                      btnType="button"
-                      title="Confirm"
-                      styles="w-full bg-gray-700 text-white hover:bg-gray-800"
-                      handleClick={(e) => handleSubmit(e)}
-                    />
-                  )}
                 </div>
-              </div>
+              ) : (
+                <div className="flex-1 space-y-6">
+                  <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
+                    <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
+                      You are a budget holder!
+                    </p>
+                    <div className="p-6 bg-white rounded-lg space-y-2">
+                      <h4 className="font-epilogue font-semibold text-[16px] text-black">
+                        Vote for this project?
+                      </h4>
+                      <p className="font-epilogue font-normal text-gray-600">
+                        make sure you have checked the project details and
+                        reputations by community members.
+                      </p>
+                    </div>
+                    <Forms
+                      labelName="Amount of Vote"
+                      inputType="number"
+                      placeholder="Enter amount of Vote"
+                      handleChange={(e) =>
+                        handleVoteChange("AllocatedAmountsOfPoints", e)
+                      }
+                      value={voteState.AllocatedAmountsOfPoints}
+                    />
+                    <textarea
+                      rows={3}
+                      placeholder="I wanna vote for this project because..."
+                      className="w-full p-4 outline-none border rounded-lg bg-white font-epilogue text-black text-[18px] leading-[28px] placeholder-gray-400"
+                      value={voteState.TextField}
+                      onChange={(e) => handleVoteChange("TextField", e)}
+                    ></textarea>
+                    <Button
+                      btnType="button"
+                      title="Confirm vote"
+                      styles="w-full bg-gray-700 text-white hover:bg-gray-800"
+                      handleClick={(e) => handleVoteSubmit(e)}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
           {activeTab === "Vote" && (
-            <div></div>
-            // <CustomCard
-            //   reviews={votes}
-            //   baseUrl={"https://sepolia.easscan.org/attestation/view/"}
-            // />
+            <CustomCard reviews={votes} baseUrl={baseUrl} />
           )}
           {activeTab === "Reputation" && (
             <CustomCard reviews={reputation} baseUrl={baseUrl} />
           )}
 
           {activeTab === "Updates" && (
-            <div>
-              <Updates
-                showButton={false}
-                projectId={project_uid}
-                milestones={milestonedata}
-              />
-            </div>
+            <Updates
+              showButton={false}
+              projectId={project_uid}
+              milestones={milestonedata}
+            />
           )}
         </div>
       )}

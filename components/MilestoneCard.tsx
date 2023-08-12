@@ -71,7 +71,6 @@ const MilestoneCard: React.FC<MilestoneProps> = ({
   const handleCloseModal = () => {
     setModalOpen(false);
   };
-  console.log(proof);
   const handleChange = (fieldName: string, e: any) => {
     setProof((prevState) => ({
       ...prevState,

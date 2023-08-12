@@ -18,13 +18,11 @@ const Home: NextPage = () => {
   });
   useEffect(() => {
     if (data && data.attestations) {
-      setIsLoading(true);
       const formattedData = data.attestations.map(formatDecodedData);
       setAttestationsData(formattedData);
-      setIsLoading(false);
     }
   }, [data]);
-  console.log("attestationsData", attestationsData);
+
   return (
     <Layout>
       {attestationsData.length > 0 ? (

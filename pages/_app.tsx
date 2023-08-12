@@ -19,6 +19,7 @@ import {
   baseGoerli,
   base,
   zora,
+  mainnet,
 } from "wagmi/chains";
 import { SessionProvider } from "next-auth/react";
 import { publicProvider } from "wagmi/providers/public";

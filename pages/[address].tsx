@@ -75,6 +75,7 @@ const ProjectPage: NextPage = () => {
   });
   const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
   const { data: session, status } = useSession();
+  console.log("session", session);
 
   // Fetch Project Data
   const { data } = useQuery(GET_SIMPLE_ATTESTATION, {

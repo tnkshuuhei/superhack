@@ -17,7 +17,6 @@ export const StateContextProvider = ({ children }: any) => {
   const { address: addr } = useAccount();
   const { data: ENSname } = useEnsName({ address: addr });
   const address = ENSname ? ENSname : addr;
-  console.log("Address: ", address);
   const { chain, chains } = useNetwork();
   const [currentChainId, setCurrentChainId] = useState<number>(11155111);
   useEffect(() => {
@@ -38,9 +37,7 @@ export const StateContextProvider = ({ children }: any) => {
     refUID: string = ZERO_BYTES32
   ) => {
     const schemaData = transformFormToSchema(forms, schemaType);
-
     const encodedData = encodeSchemaData(schemaData, schemaType);
-
     try {
       const tx = await eas.attest({
         schema: uid,

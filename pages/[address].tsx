@@ -12,13 +12,9 @@ import {
   Updates,
   Forms,
 } from "@/components";
-import { optimism } from "@/assets";
+import { Logo, optimism } from "@/assets";
 import { SCHEMA_UID, formatDecodedData, BASE_URL } from "@/utils";
-import {
-  GET_SIMPLE_ATTESTATION,
-  GET_ATTESTATION_BY_REFID,
-  GET_ALL_ATTESTATIONS,
-} from "../graphql";
+import { GET_SIMPLE_ATTESTATION, GET_ATTESTATION_BY_REFID } from "../graphql";
 import { useQuery } from "@apollo/client";
 import { signIn, useSession } from "next-auth/react";
 import { useStateContext } from "@/context";
@@ -50,9 +46,13 @@ type VoteType = {
 };
 const ProjectPage: NextPage = () => {
   const router = useRouter();
+  const project_uid = router.query.address;
   const { addAttestation, address, currentChainId, baseUrl } =
     useStateContext();
-  const project_uid = router.query.address;
+
+  // WorldId Session
+  const { data: session, status } = useSession();
+  console.log("session", session);
 
   // Project & Reputation States
   const [project, setProject] = useState<ProjectType>({});
@@ -73,8 +73,6 @@ const ProjectPage: NextPage = () => {
     TextField: "",
   });
   const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
-  const { data: session, status } = useSession();
-  console.log("session", session);
 
   // Fetch Project Data
   const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
@@ -232,8 +230,8 @@ const ProjectPage: NextPage = () => {
           <div className="w-full flex md:flex-row flex-col gap-[30px]">
             <div className="bg-white w-[150px] w-[150px] rounded-xl">
               <img
-                src={project.ImageUrl || optimism}
-                alt="campaign"
+                src={project.ImageUrl || "/Logo.png"}
+                alt="top image"
                 className="w-full h-full object-cover rounded-xl"
               />
             </div>

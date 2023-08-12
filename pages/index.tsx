@@ -18,21 +18,20 @@ const Home: NextPage = () => {
   const { data } = useQuery(GET_ALL_ATTESTATIONS, {
     variables: { schemaId: SCHEMA_UID.PROJECT_SCHEMA[currentChainId] },
   });
-  const fetchVotesForProject = async (projectUid: string) => {
-    const { data: votes } = await client.query({
-      query: GET_ATTESTATION_BY_REFID,
-      variables: {
-        refUID: projectUid,
-        schemaId: SCHEMA_UID.EVALUATION_AND_VOTING_SCHEMA[currentChainId],
-      },
-    });
-    return votes.attestations;
-  };
 
   useEffect(() => {
+    const fetchVotesForProject = async (projectUid: string) => {
+      const { data: votes } = await client.query({
+        query: GET_ATTESTATION_BY_REFID,
+        variables: {
+          refUID: projectUid,
+          schemaId: SCHEMA_UID.EVALUATION_AND_VOTING_SCHEMA[currentChainId],
+        },
+      });
+      return votes.attestations;
+    };
     if (!data || !data.attestations) return;
     const fetchAndSetData = async () => {
-      setIsLoading(true);
       const attestation_data = data.attestations.map(formatDecodedData);
       if (attestation_data) {
         const projectsWithVotes = {};
@@ -59,11 +58,10 @@ const Home: NextPage = () => {
         });
         setAttestationsData(attestationsWithMatching);
         console.log("Attestations with matching: ", attestationsWithMatching);
-        setIsLoading(false);
       }
     };
     fetchAndSetData();
-  }, [data]);
+  }, [client, currentChainId, data]);
 
   return (
     <Layout>

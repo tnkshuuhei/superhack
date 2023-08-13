@@ -11,11 +11,17 @@ import {
   GET_SIMPLE_ATTESTATION,
 } from "@/graphql";
 import { useQuery, useApolloClient } from "@apollo/client";
-import { formatDecodedData, SCHEMA_UID, calculateMatching } from "@/utils";
+import {
+  formatDecodedData,
+  SCHEMA_UID,
+  calculateMatching,
+  ROUND_CONTRACT,
+} from "@/utils";
 import { RoundInfoType } from "@/utils/types";
 
 const User: NextPage = () => {
   const [attestationsData, setAttestationsData] = useState([]);
+  const [filteredAttestations, setFilteredAttestations] = useState([]);
   const { address, currentChainId } = useStateContext();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -37,7 +43,7 @@ const User: NextPage = () => {
   };
   const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
     variables: {
-      id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
+      id: ROUND_CONTRACT[currentChainId],
     },
   });
   const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
@@ -86,7 +92,11 @@ const User: NextPage = () => {
           const matchingAmount = result[attestation.id]?.matchingAmount;
           return { ...attestation, matchingAmount };
         });
+        const addressFilteredAttestations = attestationsWithMatching.filter(
+          (attestation) => attestation.attester === address
+        );
         setAttestationsData(attestationsWithMatching);
+        setFilteredAttestations(addressFilteredAttestations);
         console.log("Attestations with matching: ", attestationsWithMatching);
       }
     };
@@ -97,11 +107,11 @@ const User: NextPage = () => {
   };
   return (
     <Layout>
-      {attestationsData.length > 0 ? (
+      {filteredAttestations.length > 0 ? (
         <ProjectList
           title="Your Projects"
           isLoading={isLoading}
-          projects={attestationsData}
+          projects={filteredAttestations}
         />
       ) : (
         <div className="flex justify-center my-[50px]">

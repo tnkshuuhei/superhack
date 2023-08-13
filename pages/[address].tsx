@@ -43,6 +43,7 @@ const ProjectPage: NextPage = () => {
     console.log("verified: ", result);
     setWorldProof(result);
   };
+  console.log("worldproof", worldproof);
   const handleVerify = (proof) => {
     console.log("proof", proof);
   };
@@ -115,7 +116,6 @@ const ProjectPage: NextPage = () => {
     if (roundData) {
       const roundattestation = formatDecodedData(roundData.attestation);
       setRoundInfo(roundattestation);
-      console.log("roundattestation", roundattestation);
     }
   }, [roundData, address]);
 
@@ -293,7 +293,6 @@ const ProjectPage: NextPage = () => {
               view attestation
             </a>
           </div>
-
           <div className="flex justify-center items-center">
             <div className="flex flex-row overflow-x-auto whitespace-nowrap md:gap-8 py-4 my-2">
               {["About", "Vote", "Reputation", "Updates"].map((tab) => {

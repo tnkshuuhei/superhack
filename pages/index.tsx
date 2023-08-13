@@ -37,7 +37,6 @@ const Home: NextPage = () => {
     if (roundData) {
       const roundattestation = formatDecodedData(roundData.attestation);
       setRoundInfo(roundattestation);
-      console.log("roundattestation", roundattestation);
     }
   }, [roundData, address]);
 
@@ -74,13 +73,11 @@ const Home: NextPage = () => {
           projectsWithVotes[project.id] = projectVotes;
         }
         const result = calculateMatching(projectsWithVotes, pool);
-        console.log("result: ", result);
         const attestationsWithMatching = attestation_data.map((attestation) => {
           const matchingAmount = result[attestation.id]?.matchingAmount;
           return { ...attestation, matchingAmount };
         });
         setAttestationsData(attestationsWithMatching);
-        console.log("Attestations with matching: ", attestationsWithMatching);
       }
     };
     fetchAndSetData();

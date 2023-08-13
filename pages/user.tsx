@@ -55,7 +55,6 @@ const User: NextPage = () => {
     if (roundData) {
       const roundattestation = formatDecodedData(roundData.attestation);
       setRoundInfo(roundattestation);
-      console.log("roundattestation", roundattestation);
     }
   }, [roundData, address]);
   useEffect(() => {

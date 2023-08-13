@@ -10,7 +10,12 @@ import {
   GET_ATTESTATION_BY_REFID,
   GET_SIMPLE_ATTESTATION,
 } from "../graphql";
-import { calculateMatching, formatDecodedData, ROUND_CONTRACT, SCHEMA_UID } from "@/utils";
+import {
+  calculateMatching,
+  formatDecodedData,
+  ROUND_CONTRACT,
+  SCHEMA_UID,
+} from "@/utils";
 import { useApolloClient } from "@apollo/client";
 import { RoundInfoType } from "@/utils/types";
 

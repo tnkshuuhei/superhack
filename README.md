@@ -88,13 +88,22 @@ Here is a use flow and descriptions what technologies are used in each part :
 - EthGlobal team
 - Optimism team
 - EAS team
-- The Graph team
 - Worldcoin team
 
+and some other refference:
+- https://mirror.xyz/cerv1.eth/tCjpRODfiYpnKIgPLRplW0lAopVP3no_JmI34dNsAWk
+- https://gov.optimism.io/t/measuring-impact-data-driven-content-performance/6092
+- https://gov.optimism.io/t/retropgf-round-2-voting-rationale/5570
+- https://gov.gitcoin.co/t/impact-certificates-proposals-wanted/10499
+- https://www.gitcoin.co/
+- https://hypercerts.org/
+
 ## Team
-Mohak github@Mnm458
-Steve github@tnkshuuhei
-Hiro @ppoy05
+[Mohak](https://github.com/Mnm458)
+
+[Steve](https://github.com/tnkshuuhei)
+
+[Hiro](https://github.com/ppoy05)
 
 ## Getting Started
 

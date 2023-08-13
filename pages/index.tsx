@@ -10,7 +10,7 @@ import {
   GET_ATTESTATION_BY_REFID,
   GET_SIMPLE_ATTESTATION,
 } from "../graphql";
-import { calculateMatching, formatDecodedData, SCHEMA_UID } from "@/utils";
+import { calculateMatching, formatDecodedData, ROUND_CONTRACT, SCHEMA_UID } from "@/utils";
 import { useApolloClient } from "@apollo/client";
 import { RoundInfoType } from "@/utils/types";
 
@@ -29,7 +29,7 @@ const Home: NextPage = () => {
   });
   const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
     variables: {
-      id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
+      id: ROUND_CONTRACT[currentChainId],
     },
   });
 

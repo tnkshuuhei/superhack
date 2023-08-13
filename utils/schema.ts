@@ -8,48 +8,49 @@ const SCHEMA_UID = {
   EVALUATION_AND_VOTING_SCHEMA: {
     11155111:
       "0x90595bfa3590f2122632a6fe8f05854bf0712424c4636fd3ddef2ea51ddf14ec", // Sepolia
-    420: "0x90595bfa3590f2122632a6fe8f05854bf0712424c4636fd3ddef2ea51ddf14ec", // op-goerli
+    420: "0x77b733a5e4e470345f18d615526a5617a557a168f03a92064332278e39b54e34", // op-goerli
     10: "0x90595bfa3590f2122632a6fe8f05854bf0712424c4636fd3ddef2ea51ddf14ec", // Optimism
   },
   REPUTATION_SCHEMA: {
     11155111:
       "0xced0f503cd6c6e1893a34cf6acf34f005e550edadb622c2619c7c3af26abdf17", // Sepolia
-    420: "0xced0f503cd6c6e1893a34cf6acf34f005e550edadb622c2619c7c3af26abdf17", // op-goerli
+    420: "0x0ee6fceaf65996497519c39851e67671c84d941117fabd28a87ca392ac2fd201", // op-goerli
     10: "0xced0f503cd6c6e1893a34cf6acf34f005e550edadb622c2619c7c3af26abdf17", // Optimism
   },
   PAYMENT_FOR_THE_ROUND_SCHEMA: {
     11155111:
       "0x30b0e2f7e4193a2bbcbeba98603ac8a3afa5e2acf92c463c339dd4fe34c9e259", // Sepolia
-    420: "0x30b0e2f7e4193a2bbcbeba98603ac8a3afa5e2acf92c463c339dd4fe34c9e259", // op-goerli
+    420: "0xd5581c33f866b71c38a921103295f6717ea10ea19b820093643921836e88bfc6", // op-goerli
     10: "0x30b0e2f7e4193a2bbcbeba98603ac8a3afa5e2acf92c463c339dd4fe34c9e259", // Optimism
   },
   PROJECT_APPLICATION_FOR_MILESTONE_GRANT_SCHEMA: {
     11155111:
       "0x0e89802a9520d32a0c576b6992c5ef2858a41820a0123da53eae462a3ade9396", // Sepolia
-    420: "0x0e89802a9520d32a0c576b6992c5ef2858a41820a0123da53eae462a3ade9396", // op-goerli
+    420: "0x470f33bfdbb6636cb2508056e1f4d2f4b28054e5d9cea08f26806f8e865bc1c2", // op-goerli
     10: "0x0e89802a9520d32a0c576b6992c5ef2858a41820a0123da53eae462a3ade9396", // Optimism
   },
   REVIEW_FOR_APPLICATION_OF_MILESTONE_SCHEMA: {
     11155111:
       "0x81ef80c57b694314de0d40e6f71d91846800f3f3918a2b08059d623c33e44912", // Sepolia
-    420: "0x81ef80c57b694314de0d40e6f71d91846800f3f3918a2b08059d623c33e44912", // op-goerli
+    420: "0xc7b0b7ca17ce1cc2979a4e86270d0e1556ebcff0be53e9fbecc40cef925c4081", // op-goerli
     10: "0x81ef80c57b694314de0d40e6f71d91846800f3f3918a2b08059d623c33e44912", // Optimism
   },
   PROOF_OF_WORK_SCHEMA: {
     11155111:
       "0xea1d0ddb6fc8a23af189e22d3c89a70da429804f47466c12c767fa3c04685eed", // Sepolia
-    420: "0xea1d0ddb6fc8a23af189e22d3c89a70da429804f47466c12c767fa3c04685eed", // op-goerli
+    420: "0x242b0935cf90a24c94c4259cec7a989398f0a53b2299bc92d3fc6665801a9625", // op-goerli
     10: "0xea1d0ddb6fc8a23af189e22d3c89a70da429804f47466c12c767fa3c04685eed", // Optimism
   },
   PAYMENT_FOR_THE_MILESTONE_SCHEMA: {
     11155111:
       "0x599fd25836ecb7e9ddd7381b35d3d76925a8c2c2aef4f985ff281664500f37e4", // Sepolia
-    420: "0x599fd25836ecb7e9ddd7381b35d3d76925a8c2c2aef4f985ff281664500f37e4", // op-goerli
+    420: "0x00b341a788f9b10d69334281400aeeeb6d0e9b843788cfc293a65b2fd948d7e4", // op-goerli
     10: "0x599fd25836ecb7e9ddd7381b35d3d76925a8c2c2aef4f985ff281664500f37e4", // Optimism
   },
   ROUND_SCHEMA: {
     11155111:
       "0xfed37cf7dcb7b91ab50bb2e3535eca537f7fdb6f5d541d96c621828aed104810", // Sepolia
+    420: "0x4bf03cb9c23af69330c184f3445ce4fa21b67e14ee9466b5f7426825140fbf30", // op-goerli
   },
 };
 export default SCHEMA_UID;

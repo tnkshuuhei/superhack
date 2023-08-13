@@ -16,6 +16,7 @@ import {
   BASE_URL,
   calculateMatching,
   formatDecodedData,
+  ROUND_CONTRACT,
   SCHEMA_UID,
 } from "@/utils";
 import {
@@ -85,7 +86,7 @@ const ProjectPage: NextPage = () => {
   });
   const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
     variables: {
-      id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
+      id: ROUND_CONTRACT[currentChainId],
     },
   });
   const { data: allproject } = useQuery(GET_ALL_ATTESTATIONS, {

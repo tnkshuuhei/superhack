@@ -17,6 +17,7 @@ import {
   formatDecodedData,
   BASE_URL,
   calculateMatching,
+  ROUND_CONTRACT,
 } from "@/utils";
 import {
   GET_SIMPLE_ATTESTATION,
@@ -115,7 +116,7 @@ const ProjectPage: NextPage = () => {
   // and project schema has a round refUID of the round schema
   const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
     variables: {
-      id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
+      id: ROUND_CONTRACT[currentChainId],
     },
   });
   const [roundInfo, setRoundInfo] = useState<RoundInfoType>({

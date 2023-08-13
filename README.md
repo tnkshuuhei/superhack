@@ -72,7 +72,7 @@ Here is a use flow and descriptions what technologies are used in each part :
 - Payment info including tx hash is attested with EAS.
 
 
-## deployed contracts and links
+## Deployed contracts and links
 
 ## Tech stack
 - Next.js / Vercel

@@ -23,29 +23,36 @@ import {
   GET_ATTESTATION_BY_REFID,
   GET_ALL_ATTESTATIONS,
 } from "../graphql";
+import { ethers } from "ethers";
 import { useApolloClient, useQuery } from "@apollo/client";
 import { signIn, useSession } from "next-auth/react";
 import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
 import { useStateContext } from "@/context";
 import { ProjectType, RoundInfoType, VoteType } from "@/utils/types";
-import { ethers } from "ethers";
-import { Logo } from "@/assets";
 
 const ProjectPage: NextPage = () => {
   const router = useRouter();
   const project_uid = router.query.address;
-  const { addAttestation, address, currentChainId, baseUrl } =
-    useStateContext();
+  const {
+    addAttestation,
+    address,
+    currentChainId,
+    baseUrl,
+    proofs,
+    setProofs,
+  } = useStateContext();
   // WorldId Session
   const [worldproof, setWorldProof] = useState<ISuccessResult>();
   const { data: session, status } = useSession();
   const onSuccess = (result: ISuccessResult) => {
     console.log("verified: ", result);
     setWorldProof(result);
+    setProofs(result);
   };
   console.log("worldproof", worldproof);
+  console.log("global proofs: ", proofs);
   const handleVerify = (proof) => {
-    console.log("proof", proof);
+    // console.log("proof", proof);
   };
   const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
   // Project & Reputation States
@@ -62,7 +69,11 @@ const ProjectPage: NextPage = () => {
     ProjectUid: project_uid,
     TextField: "",
     VerifiedWithWorldid: true,
+    merkle_root: "",
+    nullifier_hash: "",
+    proof: "",
   });
+
   // Vote State for the form
   const [voteState, setVoteState] = useState({
     ProjectUid: project_uid,
@@ -154,9 +165,13 @@ const ProjectPage: NextPage = () => {
     setReputationState((prevState) => ({
       ...prevState,
       ProjectUid: project_uid,
+      merkle_root: proofs.merkle_root,
+      nullifier_hash: proofs.nullifier_hash,
+      proof: proofs.proof,
       [fieldName]: e.target.value,
     }));
   };
+  console.log("reputationState", reputationState);
   const handleVoteChange = (fieldName: string, e: any) => {
     setVoteState((prevState) => ({
       ...prevState,
@@ -342,59 +357,67 @@ const ProjectPage: NextPage = () => {
               </div>
               {!isBudgetHolder ? (
                 <div className="flex-1 space-y-6">
-                  <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
-                    <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
-                      Add Reputation
-                    </p>
-                    <textarea
-                      rows={3}
-                      placeholder="I support this project because..."
-                      className="w-full p-4 outline-none border rounded-lg bg-white font-epilogue text-black text-[18px] leading-[28px] placeholder-gray-400"
-                      onChange={(e) => handleChange("TextField", e)}
-                    ></textarea>
-                    <div className="p-6 bg-white rounded-lg space-y-4">
-                      <h4 className="font-epilogue font-semibold text-[16px] text-black">
-                        Show gratitude with action.
-                      </h4>
-                      <p className="font-epilogue font-normal text-gray-600">
-                        Share your impressions and experiences to pave the way
-                        for a brighter future.
+                  {proofs ? (
+                    <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
+                      <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
+                        Add Reputation
                       </p>
-                    </div>
-
-                    <IDKitWidget
-                      app_id="app_staging_e21cd92348d6ce379c0eb3da04148646" // obtained from the Developer Portal
-                      action="superhack" // this is your action name from the Developer Portal
-                      signal="user_value" // any arbitrary value the user is committing to, e.g. a vote
-                      onSuccess={onSuccess}
-                      credential_types={[]} // we recommend only allowing orb verification on-chain
-                      enableTelemetry
-                    >
-                      {({ open }) => (
-                        <Button
-                          btnType="button"
-                          title="Verify with World ID"
-                          styles="text-black bg-white hover:bg-gray-100 w-full"
-                          handleClick={open}
-                        ></Button>
-                      )}
-                    </IDKitWidget>
-                    {/* <Button
+                      <textarea
+                        rows={3}
+                        placeholder="I support this project because..."
+                        className="w-full p-4 outline-none border rounded-lg bg-white font-epilogue text-black text-[18px] leading-[28px] placeholder-gray-400"
+                        onChange={(e) => handleChange("TextField", e)}
+                      ></textarea>
+                      <div className="p-6 bg-white rounded-lg space-y-4">
+                        <h4 className="font-epilogue font-semibold text-[16px] text-black">
+                          Show gratitude with action.
+                        </h4>
+                        <p className="font-epilogue font-normal text-gray-600">
+                          Share your impressions and experiences to pave the way
+                          for a brighter future.
+                        </p>
+                      </div>
+                      <Button
                         btnType="button"
-                        title="Sign In with Worldcoin"
-                        styles="w-full bg-white text-black"
-                        handleClick={(e) => {
-                          e.preventDefault();
-                          signIn("worldcoin");
-                        }}
-                      /> */}
-                    {/* <Button
-                      btnType="button"
-                      title="Confirm"
-                      styles="w-full bg-gray-700 text-white hover:bg-gray-800"
-                      handleClick={(e) => handleSubmit(e)}
-                    /> */}
-                  </div>
+                        title="Confirm"
+                        styles="w-full bg-gray-700 text-white hover:bg-gray-800"
+                        handleClick={(e) => handleSubmit(e)}
+                      />
+                    </div>
+                  ) : (
+                    <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
+                      <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
+                        Add Reputation
+                      </p>
+                      <div className="p-6 bg-white rounded-lg space-y-4">
+                        <h4 className="font-epilogue font-semibold text-[16px] text-red-500">
+                          make sure you have verified to add reputation
+                        </h4>
+                        <p className="font-epilogue font-normal text-gray-600">
+                          only verified users can add reputation for this
+                          project. DONT WORRY, reloading the browser will reset
+                          the authentication details.
+                        </p>
+                      </div>
+                      <IDKitWidget
+                        app_id={process.env.NEXT_PUBLIC_STAGING_APP_ID || ""}
+                        action="superhack"
+                        signal="user_value"
+                        onSuccess={onSuccess}
+                        credential_types={[]} // we recommend only allowing orb verification on-chain
+                        enableTelemetry
+                      >
+                        {({ open }) => (
+                          <Button
+                            btnType="button"
+                            title="Verify with World ID"
+                            styles="text-black bg-white border w-full shadow-sm"
+                            handleClick={open}
+                          ></Button>
+                        )}
+                      </IDKitWidget>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="flex-1 space-y-6">

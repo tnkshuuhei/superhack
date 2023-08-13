@@ -30,8 +30,10 @@ Here is a use flow and descriptions what technologies are used in each part :
 - Each application is attested with EAS.
 - Project owners can apply for this in front-end built with Next.js.
 
+
 2. they will be listed on front-end.
 - Dashboard is available.
+
 
 3. Community members can post reputation of each project after they are verified as an unique person.
 - World ID contract helps to verify each community member as an unique person.
@@ -45,24 +47,30 @@ Here is a use flow and descriptions what technologies are used in each part :
 - Calculation method is based on Quadratic Funding.
 - Voters can do the whole process on UI.
 
+
 5.  The grant amount for each project will be determined according to the points awarded, and the grant amount will be sent to the wallet address entered in the application.
 - Payment info including tx hash is attested with EAS.
 - Project owners can check their status on UI.
 
+
 6. After the Grant Round ends, project owners can submit their 1 milestone, its deadline and requested amount to apply for Milestone Grant.
 - Milestone applications are attested with EAS.
 
+
 7. Applications are reviewed by a grant provider(e.g. Ecosystem foundation) and there may be adjustment of amount or submitted application could be rejected for some reasons, but if approved, projects unconditionally receive the approved amount as long as you meet the submitted milestone before the deadline. 
 - Approved amount and other info are attested with EAS.
+
 
 8. Project owners submit proof of milestone by deadline.
 - Submitted contents are attested with EAS.
 - Project owners can check their status on UI.
 
+
 9. A grant provider checks whether it is accomplished and pay approved amount if so.
 - Submitted contents are reviewed by Grant Provider and attested with EAS.
 - Project owners can check their status on UI.
 - Payment info including tx hash is attested with EAS.
+
 
 ## deployed contracts and links
 

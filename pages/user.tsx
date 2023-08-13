@@ -19,21 +19,12 @@ const User: NextPage = () => {
   const { address, currentChainId } = useStateContext();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const schemaIdValue = SCHEMA_UID.PROJECT_SCHEMA[currentChainId];
   const client = useApolloClient();
 
   const { data } = useQuery(GET_ALL_ATTESTATIONS, {
     variables: { schemaId: SCHEMA_UID.PROJECT_SCHEMA[currentChainId] },
   });
-  useEffect(() => {
-    if (data && data.attestations) {
-      const formattedData = data.attestations.map(formatDecodedData);
-      setAttestationsData(formattedData);
-    }
-  }, [data]);
-  const handleClick = () => {
-    router.push("/user/createproject");
-  };
+
   const fetchVotesForProject = async (projectUid: string) => {
     const { data: votes } = await client.query({
       query: GET_ATTESTATION_BY_REFID,
@@ -55,13 +46,18 @@ const User: NextPage = () => {
     BudgeHolders: [],
   });
   useEffect(() => {
+    if (data && data.attestations) {
+      const formattedData = data.attestations.map(formatDecodedData);
+      setAttestationsData(formattedData);
+    }
+  }, [data]);
+  useEffect(() => {
     if (roundData) {
       const roundattestation = formatDecodedData(roundData.attestation);
       setRoundInfo(roundattestation);
       console.log("roundattestation", roundattestation);
     }
   }, [roundData, address]);
-
   useEffect(() => {
     if (!data || !data.attestations) return;
     const fetchAndSetData = async () => {
@@ -97,7 +93,9 @@ const User: NextPage = () => {
     };
     fetchAndSetData();
   }, [data, roundInfo.GrantPool]);
-
+  const handleClick = () => {
+    router.push("/user/createproject");
+  };
   return (
     <Layout>
       {attestationsData.length > 0 ? (

@@ -12,7 +12,6 @@ import {
   Updates,
   CustomCard,
 } from "@/components";
-import { optimism } from "@/assets";
 import {
   BASE_URL,
   calculateMatching,
@@ -23,7 +22,7 @@ import {
   GET_ALL_ATTESTATIONS,
   GET_ATTESTATION_BY_REFID,
   GET_SIMPLE_ATTESTATION,
-} from "../../graphql";
+} from "@/graphql/queries";
 import { useApolloClient, useQuery } from "@apollo/client";
 import { useStateContext } from "@/context";
 import { ProjectType, RoundInfoType } from "@/utils/types";
@@ -32,9 +31,30 @@ import { ethers } from "ethers";
 const ProjectPage: NextPage = () => {
   const router = useRouter();
   const uid = router.query;
+  const client = useApolloClient();
+  const [amount, setAmount] = useState(0);
   const { addAttestation, address, currentChainId, baseUrl } =
     useStateContext();
   const project_uid = router.query.address;
+  const [milestonedata, setMilestoneData] = useState({});
+  const [reputation, setReputation] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("About");
+  const [project, setProject] = useState<ProjectType>({});
+  const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
+    Organization: "",
+    GrantPool: 0,
+    BudgeHolders: [],
+  });
+  const [milestones, setMilestones] = useState({
+    ProjectUid: project_uid,
+    RequestedAmount: 0,
+    CurrentStatusOfProject: "",
+    MilestoneDescription: "",
+    UseOfFunds: "",
+    ContinueWithLowerAmount: "true",
+    Deadline: 1691744871,
+  });
   // Fetch Project Data
   const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
     variables: { id: project_uid },
@@ -63,20 +83,13 @@ const ProjectPage: NextPage = () => {
       schemaId: SCHEMA_UID.EVALUATION_AND_VOTING_SCHEMA[currentChainId],
     },
   });
-
-  const [milestonedata, setMilestoneData] = useState({});
-  const [reputation, setReputation] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("About");
-  const [project, setProject] = useState<ProjectType>({});
-  const [milestones, setMilestones] = useState({
-    ProjectUid: project_uid,
-    RequestedAmount: 0,
-    CurrentStatusOfProject: "",
-    MilestoneDescription: "",
-    UseOfFunds: "",
-    ContinueWithLowerAmount: "true",
-    Deadline: 1691744871,
+  const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
+    variables: {
+      id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
+    },
+  });
+  const { data: allproject } = useQuery(GET_ALL_ATTESTATIONS, {
+    variables: { schemaId: SCHEMA_UID.PROJECT_SCHEMA[currentChainId] },
   });
 
   useEffect(() => {
@@ -97,16 +110,6 @@ const ProjectPage: NextPage = () => {
       setReputation(reputation_data);
     }
   }, [reputationData, project_uid]);
-  const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
-    variables: {
-      id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
-    },
-  });
-  const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
-    Organization: "",
-    GrantPool: 0,
-    BudgeHolders: [],
-  });
   useEffect(() => {
     if (roundData) {
       const roundattestation = formatDecodedData(roundData.attestation);
@@ -173,11 +176,6 @@ const ProjectPage: NextPage = () => {
         return 0;
     }
   };
-  const { data: allproject } = useQuery(GET_ALL_ATTESTATIONS, {
-    variables: { schemaId: SCHEMA_UID.PROJECT_SCHEMA[currentChainId] },
-  });
-  const client = useApolloClient();
-  const [amount, setAmount] = useState(0);
 
   useEffect(() => {
     const fetchVotesForProject = async (projectUid: string) => {

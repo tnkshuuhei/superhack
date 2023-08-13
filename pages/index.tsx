@@ -19,7 +19,11 @@ const Home: NextPage = () => {
   const [attestationsData, setAttestationsData] = useState([]);
   const { address, currentChainId } = useStateContext();
   const client = useApolloClient();
-
+  const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
+    Organization: "",
+    GrantPool: 0,
+    BudgeHolders: [],
+  });
   const { data } = useQuery(GET_ALL_ATTESTATIONS, {
     variables: { schemaId: SCHEMA_UID.PROJECT_SCHEMA[currentChainId] },
   });
@@ -28,11 +32,7 @@ const Home: NextPage = () => {
       id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
     },
   });
-  const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
-    Organization: "",
-    GrantPool: 0,
-    BudgeHolders: [],
-  });
+
   useEffect(() => {
     if (roundData) {
       const roundattestation = formatDecodedData(roundData.attestation);

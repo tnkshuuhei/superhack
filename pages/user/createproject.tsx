@@ -4,49 +4,27 @@ import React, { useState } from "react";
 import { useStateContext } from "../../context";
 import { Layout, Button, Loader, Forms } from "@/components";
 import { useRouter } from "next/router";
-import { formatDecodedData, SCHEMA_UID } from "@/utils";
+import { SCHEMA_UID } from "@/utils";
 const CreateProject: NextPage = () => {
   const router = useRouter();
   const { address, addAttestation, currentChainId } = useStateContext();
   const uid = SCHEMA_UID.PROJECT_SCHEMA[currentChainId];
-
   const [isLoading, setIsLoading] = useState(false);
   const [formState, setFormState] = useState({
-    // Round: "",
-    // ProjectName: "",
-    // ProjectDescription: "",
-    // PublicGoods: "",
-    // Sustainability: "",
-    // TeamSize: "",
-    // SubmittedDate: Math.floor(new Date().getTime() / 1000),
-    // Links: [],
-    // Website: "",
-    // Github: "",
-    // Twitter: "",
-    // PayoutAddress: "",
-    // ImageUrl: "",
-    // id: null,
-    Round: "1",
-    ProjectName: "Impact House",
-    ProjectDescription: "Impact House is built for digital public goods",
-    PublicGoods: "Impact House make public goods sustainable		",
-    Sustainability:
-      "As long as public goods grow up, Impact House can create Impact",
-    TeamSize: "1",
+    Round: "",
+    ProjectName: "",
+    ProjectDescription: "",
+    PublicGoods: "",
+    Sustainability: "",
+    TeamSize: "",
     SubmittedDate: Math.floor(new Date().getTime() / 1000),
-    Links: [
-      "https://docs.attest.sh/docs/welcome",
-      "https://optimism-goerli-bedrock.easscan.org/",
-      "https://github.com/tnkshuuhei",
-    ],
-    Website: "https://twitter.com/shutanaka_jp",
-    Github: "https://github.com/tnkshuuhei",
-    Twitter: "https://twitter.com/shutanaka_jp",
-    PayoutAddress: address,
-    // ImageUrl: "https://avatars.githubusercontent.com/u/60056322?s=280&v=4",
-    ImageUrl:
-      "https://assets-global.website-files.com/611dbb3c82ba72fbc285d4e2/613267577e2c89636109a8b9_main%20OpenGraph%20image.png",
-    // id: null,
+    Links: [],
+    Website: "",
+    Github: "",
+    Twitter: "",
+    PayoutAddress: "",
+    ImageUrl: "",
+    id: null,
   });
 
   const addLink = () => {

@@ -36,7 +36,6 @@ const ProjectPage: NextPage = () => {
   const project_uid = router.query.address;
   const { addAttestation, address, currentChainId, baseUrl } =
     useStateContext();
-
   // WorldId Session
   const [worldproof, setWorldProof] = useState<ISuccessResult>();
   const { data: session, status } = useSession();
@@ -47,13 +46,15 @@ const ProjectPage: NextPage = () => {
   const handleVerify = (proof) => {
     console.log("proof", proof);
   };
-
+  const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
   // Project & Reputation States
   const [project, setProject] = useState<ProjectType>({});
   const [reputation, setReputation] = useState([]);
   const [votes, setVotes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("About");
+  const client = useApolloClient();
+  const [amount, setAmount] = useState(0);
   const [milestonedata, setMilestoneData] = useState({});
   // Reputation State for the form
   const [reputationState, setReputationState] = useState({
@@ -67,7 +68,6 @@ const ProjectPage: NextPage = () => {
     AllocatedAmountsOfPoints: 0,
     TextField: "",
   });
-  const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
 
   // Fetch Project Data
   const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
@@ -219,8 +219,6 @@ const ProjectPage: NextPage = () => {
   const { data: allproject } = useQuery(GET_ALL_ATTESTATIONS, {
     variables: { schemaId: SCHEMA_UID.PROJECT_SCHEMA[currentChainId] },
   });
-  const client = useApolloClient();
-  const [amount, setAmount] = useState(0);
 
   useEffect(() => {
     const fetchVotesForProject = async (projectUid: string) => {

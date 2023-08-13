@@ -5,30 +5,32 @@ import { NextPage } from "next";
 import { ethers } from "ethers";
 import { useStateContext } from "../context";
 import { Layout, ProjectList, Button } from "@/components";
-import { GET_ALL_ATTESTATIONS, GET_ATTESTATION_BY_REFID } from "@/graphql";
+import {
+  GET_ALL_ATTESTATIONS,
+  GET_ATTESTATION_BY_REFID,
+  GET_SIMPLE_ATTESTATION,
+} from "@/graphql";
 import { useQuery, useApolloClient } from "@apollo/client";
-import { formatDecodedData, SCHEMA_UID, calculateMatching } from "@/utils";
+import {
+  formatDecodedData,
+  SCHEMA_UID,
+  calculateMatching,
+  ROUND_CONTRACT,
+} from "@/utils";
+import { RoundInfoType } from "@/utils/types";
 
 const User: NextPage = () => {
   const [attestationsData, setAttestationsData] = useState([]);
+  const [filteredAttestations, setFilteredAttestations] = useState([]);
   const { address, currentChainId } = useStateContext();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const schemaIdValue = SCHEMA_UID.PROJECT_SCHEMA[currentChainId];
   const client = useApolloClient();
 
   const { data } = useQuery(GET_ALL_ATTESTATIONS, {
     variables: { schemaId: SCHEMA_UID.PROJECT_SCHEMA[currentChainId] },
   });
-  useEffect(() => {
-    if (data && data.attestations) {
-      const formattedData = data.attestations.map(formatDecodedData);
-      setAttestationsData(formattedData);
-    }
-  }, [data]);
-  const handleClick = () => {
-    router.push("/user/createproject");
-  };
+
   const fetchVotesForProject = async (projectUid: string) => {
     const { data: votes } = await client.query({
       query: GET_ATTESTATION_BY_REFID,
@@ -39,11 +41,33 @@ const User: NextPage = () => {
     });
     return votes.attestations;
   };
-
+  const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
+    variables: {
+      id: ROUND_CONTRACT[currentChainId],
+    },
+  });
+  const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
+    Organization: "",
+    GrantPool: 0,
+    BudgeHolders: [],
+  });
+  useEffect(() => {
+    if (data && data.attestations) {
+      const formattedData = data.attestations.map(formatDecodedData);
+      setAttestationsData(formattedData);
+    }
+  }, [data]);
+  useEffect(() => {
+    if (roundData) {
+      const roundattestation = formatDecodedData(roundData.attestation);
+      setRoundInfo(roundattestation);
+    }
+  }, [roundData, address]);
   useEffect(() => {
     if (!data || !data.attestations) return;
     const fetchAndSetData = async () => {
-      setIsLoading(true);
+      const pool: any = ethers.utils.formatUnits(roundInfo.GrantPool, 0);
+
       const attestation_data = data.attestations.map(formatDecodedData);
       if (attestation_data) {
         const projectsWithVotes = {};
@@ -62,27 +86,32 @@ const User: NextPage = () => {
           }
           projectsWithVotes[project.id] = projectVotes;
         }
-        const result = calculateMatching(projectsWithVotes, 1000);
+        const result = calculateMatching(projectsWithVotes, pool);
         console.log("result: ", result);
         const attestationsWithMatching = attestation_data.map((attestation) => {
           const matchingAmount = result[attestation.id]?.matchingAmount;
           return { ...attestation, matchingAmount };
         });
+        const addressFilteredAttestations = attestationsWithMatching.filter(
+          (attestation) => attestation.attester === address
+        );
         setAttestationsData(attestationsWithMatching);
+        setFilteredAttestations(addressFilteredAttestations);
         console.log("Attestations with matching: ", attestationsWithMatching);
-        setIsLoading(false);
       }
     };
     fetchAndSetData();
-  }, [data]);
-
+  }, [data, roundInfo.GrantPool]);
+  const handleClick = () => {
+    router.push("/user/createproject");
+  };
   return (
     <Layout>
-      {attestationsData.length > 0 ? (
+      {filteredAttestations.length > 0 ? (
         <ProjectList
           title="Your Projects"
           isLoading={isLoading}
-          projects={attestationsData}
+          projects={filteredAttestations}
         />
       ) : (
         <div className="flex justify-center my-[50px]">

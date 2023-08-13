@@ -13,22 +13,25 @@ const StateContext = createContext<any>(null);
 import { useEthersSigner } from "./ethers";
 const ZERO_BYTES32 =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
+
 export const StateContextProvider = ({ children }: any) => {
-  const { address: addr } = useAccount();
-  const { data: ENSname } = useEnsName({ address: addr });
-  const address = ENSname ? ENSname : addr;
+  const { address } = useAccount();
+  // const { data: ENSname } = useEnsName({ address: addr });
+  // const address = ENSname ? ENSname : addr;
   const { chain, chains } = useNetwork();
+  const [proofs, setProofs] = useState<any>();
   const [currentChainId, setCurrentChainId] = useState<number>(11155111);
   useEffect(() => {
     if (chain) {
       setCurrentChainId(chain.id);
     }
   }, [chain]);
+  const baseUrl = BASE_URL[currentChainId];
   const EASContractAddress = CONTRACT_ADDRESS[currentChainId];
   const eas = new EAS(EASContractAddress);
   const signer: any = useEthersSigner({ chainId: currentChainId });
   eas.connect(signer);
-  const baseUrl = BASE_URL[currentChainId];
+
   const addAttestation = async (
     uid: string,
     recipient: string,
@@ -64,6 +67,8 @@ export const StateContextProvider = ({ children }: any) => {
         currentChainId,
         baseUrl,
         addAttestation,
+        proofs,
+        setProofs,
       }}
     >
       {children}

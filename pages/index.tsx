@@ -5,19 +5,45 @@ import { Layout, ProjectList } from "@/components";
 import { ethers } from "ethers";
 import { NextPage } from "next";
 import { useQuery } from "@apollo/client";
-import { GET_ALL_ATTESTATIONS, GET_ATTESTATION_BY_REFID } from "../graphql";
-import { calculateMatching, formatDecodedData, SCHEMA_UID } from "@/utils";
+import {
+  GET_ALL_ATTESTATIONS,
+  GET_ATTESTATION_BY_REFID,
+  GET_SIMPLE_ATTESTATION,
+} from "../graphql";
+import {
+  calculateMatching,
+  formatDecodedData,
+  ROUND_CONTRACT,
+  SCHEMA_UID,
+} from "@/utils";
 import { useApolloClient } from "@apollo/client";
+import { RoundInfoType } from "@/utils/types";
 
 const Home: NextPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [attestationsData, setAttestationsData] = useState([]);
   const { address, currentChainId } = useStateContext();
   const client = useApolloClient();
-
+  const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
+    Organization: "",
+    GrantPool: 0,
+    BudgeHolders: [],
+  });
   const { data } = useQuery(GET_ALL_ATTESTATIONS, {
     variables: { schemaId: SCHEMA_UID.PROJECT_SCHEMA[currentChainId] },
   });
+  const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
+    variables: {
+      id: ROUND_CONTRACT[currentChainId],
+    },
+  });
+
+  useEffect(() => {
+    if (roundData) {
+      const roundattestation = formatDecodedData(roundData.attestation);
+      setRoundInfo(roundattestation);
+    }
+  }, [roundData, address]);
 
   useEffect(() => {
     const fetchVotesForProject = async (projectUid: string) => {
@@ -32,6 +58,7 @@ const Home: NextPage = () => {
     };
     if (!data || !data.attestations) return;
     const fetchAndSetData = async () => {
+      const pool: any = ethers.utils.formatUnits(roundInfo.GrantPool, 0);
       const attestation_data = data.attestations.map(formatDecodedData);
       if (attestation_data) {
         const projectsWithVotes = {};
@@ -50,18 +77,16 @@ const Home: NextPage = () => {
           }
           projectsWithVotes[project.id] = projectVotes;
         }
-        const result = calculateMatching(projectsWithVotes, 1000);
-        console.log("result: ", result);
+        const result = calculateMatching(projectsWithVotes, pool);
         const attestationsWithMatching = attestation_data.map((attestation) => {
           const matchingAmount = result[attestation.id]?.matchingAmount;
           return { ...attestation, matchingAmount };
         });
         setAttestationsData(attestationsWithMatching);
-        console.log("Attestations with matching: ", attestationsWithMatching);
       }
     };
     fetchAndSetData();
-  }, [client, currentChainId, data]);
+  }, [client, currentChainId, data, roundInfo.GrantPool]);
 
   return (
     <Layout>

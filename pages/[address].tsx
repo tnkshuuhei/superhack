@@ -12,67 +12,75 @@ import {
   Updates,
   Forms,
 } from "@/components";
-import { Logo, optimism } from "@/assets";
-import { SCHEMA_UID, formatDecodedData, BASE_URL } from "@/utils";
-import { GET_SIMPLE_ATTESTATION, GET_ATTESTATION_BY_REFID } from "../graphql";
-import { useQuery } from "@apollo/client";
+import {
+  SCHEMA_UID,
+  formatDecodedData,
+  BASE_URL,
+  calculateMatching,
+  ROUND_CONTRACT,
+} from "@/utils";
+import {
+  GET_SIMPLE_ATTESTATION,
+  GET_ATTESTATION_BY_REFID,
+  GET_ALL_ATTESTATIONS,
+} from "../graphql";
+import { ethers } from "ethers";
+import { useApolloClient, useQuery } from "@apollo/client";
 import { signIn, useSession } from "next-auth/react";
+import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
 import { useStateContext } from "@/context";
-type ProjectType = {
-  ProjectName?: string;
-  ProjectDescription?: string;
-  PublicGoods?: string;
-  Sustainability?: string;
-  TeamSize?: string;
-  SubmittedDate?: string;
-  Links?: string[];
-  Website?: string;
-  Github?: string;
-  Twitter?: string;
-  PayoutAddress?: string;
-  Round?: string;
-  ImageUrl?: string;
-  id?: number | null;
-};
-type RoundInfoType = {
-  Organization: string;
-  GrantPool: number;
-  BudgeHolders: string[];
-};
-type VoteType = {
-  ProjectUid: any;
-  AllocatedAmountsOfPoints: number;
-  TextField: string;
-};
+import { ProjectType, RoundInfoType, VoteType } from "@/utils/types";
+
 const ProjectPage: NextPage = () => {
   const router = useRouter();
   const project_uid = router.query.address;
-  const { addAttestation, address, currentChainId, baseUrl } =
-    useStateContext();
-
+  const {
+    addAttestation,
+    address,
+    currentChainId,
+    baseUrl,
+    proofs,
+    setProofs,
+  } = useStateContext();
   // WorldId Session
+  const [worldproof, setWorldProof] = useState<ISuccessResult>();
   const { data: session, status } = useSession();
-  console.log("session", session);
-
+  const onSuccess = (result: ISuccessResult) => {
+    console.log("verified: ", result);
+    setWorldProof(result);
+    setProofs(result);
+  };
+  console.log("worldproof", worldproof);
+  console.log("global proofs: ", proofs);
+  const handleVerify = (proof) => {
+    // console.log("proof", proof);
+  };
+  const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
   // Project & Reputation States
   const [project, setProject] = useState<ProjectType>({});
   const [reputation, setReputation] = useState([]);
+  const [votes, setVotes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("About");
+  const client = useApolloClient();
+  const [amount, setAmount] = useState(0);
   const [milestonedata, setMilestoneData] = useState({});
   // Reputation State for the form
   const [reputationState, setReputationState] = useState({
     ProjectUid: project_uid,
     TextField: "",
     VerifiedWithWorldid: true,
+    merkle_root: "",
+    nullifier_hash: "",
+    proof: "",
   });
+
   // Vote State for the form
   const [voteState, setVoteState] = useState({
     ProjectUid: project_uid,
     AllocatedAmountsOfPoints: 0,
     TextField: "",
   });
-  const schemaId = SCHEMA_UID.REPUTATION_SCHEMA[currentChainId];
 
   // Fetch Project Data
   const { data } = useQuery(GET_SIMPLE_ATTESTATION, {
@@ -108,7 +116,7 @@ const ProjectPage: NextPage = () => {
   // and project schema has a round refUID of the round schema
   const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
     variables: {
-      id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
+      id: ROUND_CONTRACT[currentChainId],
     },
   });
   const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
@@ -120,7 +128,6 @@ const ProjectPage: NextPage = () => {
     if (roundData) {
       const roundattestation = formatDecodedData(roundData.attestation);
       setRoundInfo(roundattestation);
-      console.log("roundattestation", roundattestation);
     }
   }, [roundData, address]);
 
@@ -143,7 +150,6 @@ const ProjectPage: NextPage = () => {
       setReputation(reputation_data);
     }
   }, [reputationData, project_uid]);
-  const [votes, setVotes] = useState([]);
   useEffect(() => {
     if (!VoteData || !VoteData.attestations) return;
     const vote_data = VoteData.attestations.map(formatDecodedData);
@@ -160,9 +166,13 @@ const ProjectPage: NextPage = () => {
     setReputationState((prevState) => ({
       ...prevState,
       ProjectUid: project_uid,
+      merkle_root: proofs.merkle_root,
+      nullifier_hash: proofs.nullifier_hash,
+      proof: proofs.proof,
       [fieldName]: e.target.value,
     }));
   };
+  console.log("reputationState", reputationState);
   const handleVoteChange = (fieldName: string, e: any) => {
     setVoteState((prevState) => ({
       ...prevState,
@@ -222,26 +232,82 @@ const ProjectPage: NextPage = () => {
         return 0;
     }
   };
+  const { data: allproject } = useQuery(GET_ALL_ATTESTATIONS, {
+    variables: { schemaId: SCHEMA_UID.PROJECT_SCHEMA[currentChainId] },
+  });
+
+  useEffect(() => {
+    const fetchVotesForProject = async (projectUid: string) => {
+      const { data: votes } = await client.query({
+        query: GET_ATTESTATION_BY_REFID,
+        variables: {
+          refUID: projectUid,
+          schemaId: SCHEMA_UID.EVALUATION_AND_VOTING_SCHEMA[currentChainId],
+        },
+      });
+      return votes.attestations;
+    };
+    const fetchAndProcessData = async () => {
+      if (!allproject || !allproject.attestations) return;
+
+      const attestation_data = allproject.attestations.map(formatDecodedData);
+      const projectsWithVotes = {};
+      const pool: any = ethers.utils.formatUnits(roundInfo.GrantPool, 0);
+
+      for (let project of attestation_data) {
+        const votes = await fetchVotesForProject(project.id);
+        const vote_data = votes.map(formatDecodedData);
+        const projectVotes = {};
+        for (let vote of vote_data) {
+          projectVotes[vote.id] = ethers.utils.formatUnits(
+            vote.AllocatedAmountsOfPoints,
+            0
+          );
+        }
+        projectsWithVotes[project.id] = projectVotes;
+      }
+      const result = calculateMatching(projectsWithVotes, pool);
+      const attestationsWithMatching = attestation_data.map((attestation) => {
+        const matchingAmount = result[attestation.id]?.matchingAmount;
+        return { ...attestation, matchingAmount };
+      });
+      const getObjectByAddress = (array, uid) => {
+        const matchedObject = array.find((obj) => obj.id === uid);
+        return matchedObject?.matchingAmount;
+      };
+      setAmount(getObjectByAddress(attestationsWithMatching, project_uid));
+    };
+    fetchAndProcessData();
+  }, [allproject, client, currentChainId, project_uid, roundInfo.GrantPool]);
+
   return (
     <Layout>
       {isLoading && <Loader />}
       {project && (
         <div className="bg-white p-10 rounded-xl">
-          <div className="w-full flex md:flex-row flex-col gap-[30px]">
-            <div className="bg-white w-[150px] w-[150px] rounded-xl">
+          <div className="w-full flex md:flex-row flex-col md:gap-8 gap-4 items-center">
+            <div className="w-36 rounded-xl overflow-hidden ">
               <img
-                src={project.ImageUrl || "/Logo.png"}
+                src={project.ImageUrl}
                 alt="top image"
-                className="w-full h-full object-cover rounded-xl"
+                className="w-full h-full object-cover"
               />
             </div>
-            <div className="flex items-center">
-              <div className="mt-[20px]">
-                <p className="font-epilogue font-bold text-[30px] md:text-[50px] text-[#808191] leading-[26px] text-justify">
-                  {project?.ProjectName}
-                </p>
-              </div>
-            </div>
+            <p className="font-epilogue font-bold text-3xl md:text-4xl text-gray-600 ml-4 md:ml-8 flex-grow text-left md:text-justify">
+              {project?.ProjectName}
+            </p>
+
+            <p className="font-epilogue font-bold text-2xl md:text-3xl text-gray-600 ml-4 md:ml-8">
+              $ {amount} raised
+            </p>
+            <a
+              href={`${baseUrl}/${project_uid}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-epilogue font-bold border rounded-xl m-2 p-4 shadow-sm text-red-600 ml-4 md:ml-8"
+            >
+              view attestation
+            </a>
           </div>
           <div className="flex justify-center items-center">
             <div className="flex flex-row overflow-x-auto whitespace-nowrap md:gap-8 py-4 my-2">
@@ -250,7 +316,6 @@ const ProjectPage: NextPage = () => {
                 if (tab !== "About") {
                   length = getLengthForTab(tab);
                 }
-
                 return (
                   <span
                     key={tab}
@@ -293,45 +358,67 @@ const ProjectPage: NextPage = () => {
               </div>
               {!isBudgetHolder ? (
                 <div className="flex-1 space-y-6">
-                  <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
-                    <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
-                      Add Reputation
-                    </p>
-                    <textarea
-                      rows={3}
-                      placeholder="I support this project because..."
-                      className="w-full p-4 outline-none border rounded-lg bg-white font-epilogue text-black text-[18px] leading-[28px] placeholder-gray-400"
-                      onChange={(e) => handleChange("TextField", e)}
-                    ></textarea>
-                    <div className="p-6 bg-white rounded-lg space-y-4">
-                      <h4 className="font-epilogue font-semibold text-[16px] text-black">
-                        Show gratitude with action.
-                      </h4>
-                      <p className="font-epilogue font-normal text-gray-600">
-                        Share your impressions and experiences to pave the way
-                        for a brighter future.
+                  {proofs ? (
+                    <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
+                      <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
+                        Add Reputation
                       </p>
-                    </div>
-                    {/*TODO: should be !session */}
-                    {!session ? (
-                      <Button
-                        btnType="button"
-                        title="Sign In with Worldcoin"
-                        styles="w-full bg-white text-black"
-                        handleClick={(e) => {
-                          e.preventDefault();
-                          signIn("worldcoin");
-                        }}
-                      />
-                    ) : (
+                      <textarea
+                        rows={3}
+                        placeholder="I support this project because..."
+                        className="w-full p-4 outline-none border rounded-lg bg-white font-epilogue text-black text-[18px] leading-[28px] placeholder-gray-400"
+                        onChange={(e) => handleChange("TextField", e)}
+                      ></textarea>
+                      <div className="p-6 bg-white rounded-lg space-y-4">
+                        <h4 className="font-epilogue font-semibold text-[16px] text-black">
+                          Show gratitude with action.
+                        </h4>
+                        <p className="font-epilogue font-normal text-gray-600">
+                          Share your impressions and experiences to pave the way
+                          for a brighter future.
+                        </p>
+                      </div>
                       <Button
                         btnType="button"
                         title="Confirm"
                         styles="w-full bg-gray-700 text-white hover:bg-gray-800"
                         handleClick={(e) => handleSubmit(e)}
                       />
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="p-6 bg-gray-100 rounded-lg shadow-lg space-y-6">
+                      <p className="font-epilogue font-semibold text-[22px] uppercase text-center text-black">
+                        Add Reputation
+                      </p>
+                      <div className="p-6 bg-white rounded-lg space-y-4">
+                        <h4 className="font-epilogue font-semibold text-[16px] text-red-500">
+                          make sure you have verified to add reputation
+                        </h4>
+                        <p className="font-epilogue font-normal text-gray-600">
+                          only verified users can add reputation for this
+                          project. DONT WORRY, reloading the browser will reset
+                          the authentication details.
+                        </p>
+                      </div>
+                      <IDKitWidget
+                        app_id={process.env.NEXT_PUBLIC_STAGING_APP_ID || ""}
+                        action="superhack"
+                        signal="user_value"
+                        onSuccess={onSuccess}
+                        credential_types={[]} // we recommend only allowing orb verification on-chain
+                        enableTelemetry
+                      >
+                        {({ open }) => (
+                          <Button
+                            btnType="button"
+                            title="Verify with World ID"
+                            styles="text-black bg-white border w-full shadow-sm"
+                            handleClick={open}
+                          ></Button>
+                        )}
+                      </IDKitWidget>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="flex-1 space-y-6">

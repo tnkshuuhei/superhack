@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { vercel, next, optimism } from "../assets";
+import { vercel, next, Logo } from "../assets";
 
 function extractTwitterUsername(url) {
   const pattern = /https:\/\/twitter\.com\/([a-zA-Z0-9_]+)/;
@@ -42,17 +42,17 @@ const ProjectCard = ({
             {ProjectDescription}
           </p>
         </div>
-        <div className="flex justify-between flex-wrap mt-[15px] gap-2">
+        <div className="flex justify-between flex-wrap mt-[10px] gap-2">
           <div className="flex flex-col">
             <h4 className="font-epilogue font-semibold text-[14px] text-[#808191] leading-[22px]">
               Raised of ${matchingAmount}
             </h4>
           </div>
         </div>
-        <div className="flex items-center mt-[20px] gap-[12px]">
+        <div className="flex items-center mt-[10px] gap-[12px]">
           <div className="w-[30px] h-[30px] rounded-full flex justify-center items-center overflow-hidden">
             <img
-              src={ImageUrl || optimism}
+              src={ImageUrl || Logo}
               alt="user"
               className="object-cover w-full h-full"
             />

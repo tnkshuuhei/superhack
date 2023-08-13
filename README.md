@@ -1,4 +1,7 @@
 ## Eternal Commons
+We really like what Optimism Collective's RetroPGF is doing for OSS/digital public goods, making them sustainable and giving Exit to the public goods.
+
+We wish we could create a system where not only Optimism, but more Blockchains and Rollups could easily give back to the ecosystem, and where Blockchains and digital public goods could continue to provide value with positive sums, so we We named it EternalCommons!
 
 ## Description
 How can we effectively support and maintain open-source public goods that cannot or shouldn't be monetized, but are essential for everyone?

@@ -6,7 +6,7 @@ How can we effectively support and maintain open-source public goods that cannot
 
 We've identified three key challenges:
 
-1. The impact of funding for open-source public goods lacks quantification.
+1. The impact of funding open source public goods has not been measured.
 
 2. Non-profit projects might be disadvantaged when evaluated alongside for-profit ones during the grant allocation process.
 

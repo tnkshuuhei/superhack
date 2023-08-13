@@ -1,5 +1,4 @@
-## Project Name
-Eternal Commons
+## Eternal Commons
 
 ## Description
 How can we effectively support and maintain open-source public goods that cannot or shouldn't be monetized, but are essential for everyone?
@@ -22,8 +21,19 @@ Exclusively relying on RetroPGF might cause financial lag for open-source public
 
 Projects submit milestone and deadline for evaluation. The Milestone Grant amount is determined accordingly. Meeting the criteria guarantees the grant, enhancing project sustainability for the interim period, even if the grant size is modest. This assures smoother project management until the next round.
 
+Providing incentives for continued development by the community for OSS, digital public goods, etc. will ultimately lead to the growth of the ecosystem. As a result, each blockchain ecosystem will thrive and protocol revenues will increase. 
+
+This cycle, in turn, fosters a positive-sum ecosystem with ongoing funding opportunities for OSS developers.
+
+Combined with Impact certification such as Hypercert, something like a carbon credit market could also be created on top of this.
+
+This wonderful future has motivated us to build EternalCommons!
 
 ## How we have made
+On-chain information, mainly EAS, is being fetched, along with the very nice endpoints they provide.
+
+In creating this product, utility functions such as schema and [Quadratic Funding](https://www.wtfisqf.com/) have been created.
+
 Here is a use flow and descriptions what technologies are used in each part :
 
 1. Project owners apply for Grant Round when it is open.
@@ -35,7 +45,7 @@ Here is a use flow and descriptions what technologies are used in each part :
 - Dashboard is available.
 
 
-3. Community members can post reputation of each project after they are verified as an unique person.
+3. Community members can post reputation of each project after they are verified as an unique person. Sybil resistance in community reputation is very important as Gitcoin is working on the GItcoin passport.
 - World ID contract helps to verify each community member as an unique person.
 - Verified community members are attested with EAS.
 - Verified community members can post reputation with attestation.
@@ -44,7 +54,7 @@ Here is a use flow and descriptions what technologies are used in each part :
 
 4. Voters can allocate any number of points from their 100 points to any of the projects.(In this use flow, 100 points is assumed, but it can be changed.)
 - Each evaluation and allocation are attested with EAS.
-- Calculation method is based on Quadratic Funding.
+- Allocation is calculated with voting based Quadratic Funding formula
 - Voters can do the whole process on UI.
 
 
@@ -73,16 +83,16 @@ Here is a use flow and descriptions what technologies are used in each part :
 
 
 ## Deployed contracts and links
+[resolver contract](https://goerli-optimism.etherscan.io/address/0x34935aa4901AC9ff27bF536CB84D90e409d47a2b#code)
 
 ## Tech stack
 - Next.js / Vercel
 - JS/TS/Solidity
-- Alchemy
-- Hardhat/Thirdweb/Wagmi/Rainbow-kit
+- Hardhat/Wagmi/Rainbow-kit/Ethers
 - GraphQL
 - EAS contract/SDK
 - WorldID
-- Optimism/Base/ZORA
+- Optimism
 
 ## Huge thanks to
 - EthGlobal team
@@ -97,13 +107,13 @@ and some other refference:
 - https://gov.gitcoin.co/t/impact-certificates-proposals-wanted/10499
 - https://www.gitcoin.co/
 - https://hypercerts.org/
+- https://www.wtfisqf.com/
+- https://github.com/anish-agnihotri/quadratic-funding
 
 ## Team
-[Mohak](https://github.com/Mnm458)
-
-[Steve](https://github.com/tnkshuuhei)
-
-[Hiro](https://github.com/ppoy05)
+- [Mohak](https://github.com/Mnm458)
+- [Steve](https://github.com/tnkshuuhei)
+- [Hiro](https://github.com/ppoy05)
 
 ## Getting Started
 

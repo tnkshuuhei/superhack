@@ -103,9 +103,15 @@ The resolver contract receives the merkle_root etc. created when the user authen
 
 ## Huge thanks to
 - EthGlobal team
+  - appreciate for this amazing oppotunity!!
 - Optimism team
+  - We are incorporating the activities and workflow of the Optimism Collective as a tool to easily launch RetroPGF, as Impact is difficult to assess/measure, User Reputation by the community will help to assess Impact. The Milestone base grant system, based on Attestation, is a new initiative to fund projects as long as they continue to deliver Impact, with a shorter cash flow than RetroPGF.
+Also, our EAS custom resolver contract is live on Optimism.
+Through the Eternal Commons, we will spread the belief of the Optimism Collective across the network.
 - EAS team
+  - EternalCommons is an architecture based on EAS, a tool that allows RetroPGF to be easily launched, with all data inscribed on-chain via EASschema/Attestation. In addition, custom resolver and worldId authentication are combined to achieve sybil resistance in community Reputation.
 - Worldcoin team
+  - Civil tolerance is a major issue in our Eternal Commons. It is quite difficult to prevent collusion and sybil attacks in the blockchain space, as gitcoin is working on gitcoin passport. However, worldID's strong proof of humanity and our EAS custom resolver contract provide strong sybil resistance.
 
 and some other refference:
 - https://mirror.xyz/cerv1.eth/tCjpRODfiYpnKIgPLRplW0lAopVP3no_JmI34dNsAWk

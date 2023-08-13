@@ -13,13 +13,21 @@ import {
   CustomCard,
 } from "@/components";
 import { optimism } from "@/assets";
-import { BASE_URL, formatDecodedData, SCHEMA_UID } from "@/utils";
 import {
+  BASE_URL,
+  calculateMatching,
+  formatDecodedData,
+  SCHEMA_UID,
+} from "@/utils";
+import {
+  GET_ALL_ATTESTATIONS,
   GET_ATTESTATION_BY_REFID,
   GET_SIMPLE_ATTESTATION,
 } from "../../graphql";
-import { useQuery } from "@apollo/client";
+import { useApolloClient, useQuery } from "@apollo/client";
 import { useStateContext } from "@/context";
+import { ProjectType, RoundInfoType } from "@/utils/types";
+import { ethers } from "ethers";
 
 const ProjectPage: NextPage = () => {
   const router = useRouter();
@@ -60,22 +68,7 @@ const ProjectPage: NextPage = () => {
   const [reputation, setReputation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("About");
-  const [project, setProject] = useState({
-    ProjectName: "",
-    ProjectDescription: "",
-    PublicGoods: "",
-    Sustainability: "",
-    TeamSize: "",
-    SubmittedDate: "",
-    Links: [],
-    Website: "",
-    Github: "",
-    Twitter: "",
-    PayoutAddress: "",
-    Round: "",
-    ImageUrl: "",
-    id: null,
-  });
+  const [project, setProject] = useState<ProjectType>({});
   const [milestones, setMilestones] = useState({
     ProjectUid: project_uid,
     RequestedAmount: 0,
@@ -104,7 +97,23 @@ const ProjectPage: NextPage = () => {
       setReputation(reputation_data);
     }
   }, [reputationData, project_uid]);
-
+  const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
+    variables: {
+      id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
+    },
+  });
+  const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
+    Organization: "",
+    GrantPool: 0,
+    BudgeHolders: [],
+  });
+  useEffect(() => {
+    if (roundData) {
+      const roundattestation = formatDecodedData(roundData.attestation);
+      setRoundInfo(roundattestation);
+      console.log("roundattestation", roundattestation);
+    }
+  }, [roundData, address]);
   useEffect(() => {
     if (!MilestoneData || !MilestoneData.attestations) return;
     const milestone_data = MilestoneData.attestations.map(formatDecodedData);
@@ -164,26 +173,83 @@ const ProjectPage: NextPage = () => {
         return 0;
     }
   };
+  const { data: allproject } = useQuery(GET_ALL_ATTESTATIONS, {
+    variables: { schemaId: SCHEMA_UID.PROJECT_SCHEMA[currentChainId] },
+  });
+  const client = useApolloClient();
+  const [amount, setAmount] = useState(0);
+
+  useEffect(() => {
+    const fetchVotesForProject = async (projectUid: string) => {
+      const { data: votes } = await client.query({
+        query: GET_ATTESTATION_BY_REFID,
+        variables: {
+          refUID: projectUid,
+          schemaId: SCHEMA_UID.EVALUATION_AND_VOTING_SCHEMA[currentChainId],
+        },
+      });
+      return votes.attestations;
+    };
+    const fetchAndProcessData = async () => {
+      if (!allproject || !allproject.attestations) return;
+
+      const attestation_data = allproject.attestations.map(formatDecodedData);
+      const projectsWithVotes = {};
+      const pool: any = ethers.utils.formatUnits(roundInfo.GrantPool, 0);
+
+      for (let project of attestation_data) {
+        const votes = await fetchVotesForProject(project.id);
+        const vote_data = votes.map(formatDecodedData);
+        const projectVotes = {};
+        for (let vote of vote_data) {
+          projectVotes[vote.id] = ethers.utils.formatUnits(
+            vote.AllocatedAmountsOfPoints,
+            0
+          );
+        }
+        projectsWithVotes[project.id] = projectVotes;
+      }
+      const result = calculateMatching(projectsWithVotes, pool);
+      const attestationsWithMatching = attestation_data.map((attestation) => {
+        const matchingAmount = result[attestation.id]?.matchingAmount;
+        return { ...attestation, matchingAmount };
+      });
+      const getObjectByAddress = (array, uid) => {
+        const matchedObject = array.find((obj) => obj.id === uid);
+        return matchedObject?.matchingAmount;
+      };
+      setAmount(getObjectByAddress(attestationsWithMatching, project_uid));
+    };
+    fetchAndProcessData();
+  }, [allproject, client, currentChainId, project_uid, roundInfo.GrantPool]);
   return (
     <Layout>
       {isLoading && <Loader />}
       {project && (
         <div className="bg-white p-10 rounded-xl">
-          <div className="w-full flex md:flex-row flex-col gap-[30px]">
-            <div className="bg-white w-[150px] w-[150px] rounded-xl">
+          <div className="w-full flex md:flex-row flex-col md:gap-8 gap-4 items-center">
+            <div className="w-36 rounded-xl overflow-hidden ">
               <img
-                src={project.ImageUrl || optimism}
-                alt="campaign"
-                className="w-full h-full object-cover rounded-xl"
+                src={project.ImageUrl}
+                alt="top image"
+                className="w-full h-full object-cover"
               />
             </div>
-            <div className="flex items-center">
-              <div className="mt-[20px]">
-                <p className="font-epilogue font-bold text-[30px] md:text-[50px] text-[#808191] leading-[26px] text-justify">
-                  {project?.ProjectName}
-                </p>
-              </div>
-            </div>
+            <p className="font-epilogue font-bold text-3xl md:text-4xl text-gray-600 ml-4 md:ml-8 flex-grow text-left md:text-justify">
+              {project?.ProjectName}
+            </p>
+
+            <p className="font-epilogue font-bold text-2xl md:text-3xl text-gray-600 ml-4 md:ml-8">
+              $ {amount} raised
+            </p>
+            <a
+              href={`${baseUrl}/${project_uid}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-epilogue font-bold border rounded-xl m-2 p-4 shadow-sm text-red-600 ml-4 md:ml-8"
+            >
+              view attestation
+            </a>
           </div>
           <div className="flex justify-center items-center">
             <div className="flex flex-row overflow-x-auto whitespace-nowrap md:gap-8 py-4 my-2">

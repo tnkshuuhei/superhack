@@ -4,10 +4,11 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import ProjectCard from "./ProjectCard";
 import { loader } from "../assets";
+import { ProjectType } from "@/utils/types";
 
 const ProjectList = ({ title, isLoading, projects }: any) => {
   const router = useRouter();
-  const handleRoute = (project: any) => {
+  const handleRoute = (project: ProjectType) => {
     router.push(`${router.asPath}/${project.id}`);
   };
 
@@ -34,7 +35,7 @@ const ProjectList = ({ title, isLoading, projects }: any) => {
 
         {!isLoading &&
           projects.length > 0 &&
-          projects.map((project: any) => (
+          projects.map((project: ProjectType) => (
             <ProjectCard
               key={project.id}
               {...project}

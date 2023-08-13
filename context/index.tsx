@@ -14,9 +14,9 @@ import { useEthersSigner } from "./ethers";
 const ZERO_BYTES32 =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 export const StateContextProvider = ({ children }: any) => {
-  const { address: addr } = useAccount();
-  const { data: ENSname } = useEnsName({ address: addr });
-  const address = ENSname ? ENSname : addr;
+  const { address } = useAccount();
+  // const { data: ENSname } = useEnsName({ address: addr });
+  // const address = ENSname ? ENSname : addr;
   const { chain, chains } = useNetwork();
   const [currentChainId, setCurrentChainId] = useState<number>(11155111);
   useEffect(() => {

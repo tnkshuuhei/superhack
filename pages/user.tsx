@@ -5,9 +5,14 @@ import { NextPage } from "next";
 import { ethers } from "ethers";
 import { useStateContext } from "../context";
 import { Layout, ProjectList, Button } from "@/components";
-import { GET_ALL_ATTESTATIONS, GET_ATTESTATION_BY_REFID } from "@/graphql";
+import {
+  GET_ALL_ATTESTATIONS,
+  GET_ATTESTATION_BY_REFID,
+  GET_SIMPLE_ATTESTATION,
+} from "@/graphql";
 import { useQuery, useApolloClient } from "@apollo/client";
 import { formatDecodedData, SCHEMA_UID, calculateMatching } from "@/utils";
+import { RoundInfoType } from "@/utils/types";
 
 const User: NextPage = () => {
   const [attestationsData, setAttestationsData] = useState([]);
@@ -39,11 +44,29 @@ const User: NextPage = () => {
     });
     return votes.attestations;
   };
+  const { data: roundData } = useQuery(GET_SIMPLE_ATTESTATION, {
+    variables: {
+      id: "0x89124f1740b8180dcce36fe32fe5347b97221988fc9db0c7c0dfc0535b297b1b",
+    },
+  });
+  const [roundInfo, setRoundInfo] = useState<RoundInfoType>({
+    Organization: "",
+    GrantPool: 0,
+    BudgeHolders: [],
+  });
+  useEffect(() => {
+    if (roundData) {
+      const roundattestation = formatDecodedData(roundData.attestation);
+      setRoundInfo(roundattestation);
+      console.log("roundattestation", roundattestation);
+    }
+  }, [roundData, address]);
 
   useEffect(() => {
     if (!data || !data.attestations) return;
     const fetchAndSetData = async () => {
-      setIsLoading(true);
+      const pool: any = ethers.utils.formatUnits(roundInfo.GrantPool, 0);
+
       const attestation_data = data.attestations.map(formatDecodedData);
       if (attestation_data) {
         const projectsWithVotes = {};
@@ -62,7 +85,7 @@ const User: NextPage = () => {
           }
           projectsWithVotes[project.id] = projectVotes;
         }
-        const result = calculateMatching(projectsWithVotes, 1000);
+        const result = calculateMatching(projectsWithVotes, pool);
         console.log("result: ", result);
         const attestationsWithMatching = attestation_data.map((attestation) => {
           const matchingAmount = result[attestation.id]?.matchingAmount;
@@ -70,11 +93,10 @@ const User: NextPage = () => {
         });
         setAttestationsData(attestationsWithMatching);
         console.log("Attestations with matching: ", attestationsWithMatching);
-        setIsLoading(false);
       }
     };
     fetchAndSetData();
-  }, [data]);
+  }, [data, roundInfo.GrantPool]);
 
   return (
     <Layout>

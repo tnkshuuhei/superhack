@@ -41,7 +41,6 @@ export const ApolloProvider: React.FC<ApolloProviderProps> = ({
   currentChainId,
 }) => {
   const getClients = (chainId: number): ApolloClient<any> => {
-    // ここでチェーンIDに基づいて適切な Apollo Client を選択します
     switch (chainId) {
       case 11155111:
         return sepoliaClient;

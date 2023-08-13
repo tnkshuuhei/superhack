@@ -11,7 +11,7 @@
 - JS/TS/Solidity
 - Alchemy
 - Hardhat/Thirdweb/Wagmi/Rainbow-kit
-- The Graph
+- GraphQL
 - EAS contract/SDK
 - WorldID
 - Optimism/Base/ZORA

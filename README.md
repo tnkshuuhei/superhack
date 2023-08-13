@@ -86,7 +86,11 @@ Here is a use flow and descriptions what technologies are used in each part :
 
 
 ## Deployed contracts and links
+The resolver contract receives the merkle_root etc. created when the user authenticates with WorldId and checks whether the user is eligible to add Reputation.
+
 [resolver contract](https://goerli-optimism.etherscan.io/address/0x34935aa4901AC9ff27bF536CB84D90e409d47a2b#code)
+
+[Schema](https://github.com/tnkshuuhei/superhack/blob/92bcd96ce404ecb01c386a0ef004e6fa32ef7193/utils/schema.ts#L1)
 
 ## Tech stack
 - Next.js / Vercel
